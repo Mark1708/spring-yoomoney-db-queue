@@ -17,17 +17,17 @@ import java.util.List;
 public class MessageQueueService extends QueueService {
 
 
-    private final QueueConsumer<MessageDto> consumer;
+    private final List<QueueConsumer<MessageDto>> consumers;
 
-    public MessageQueueService(List<QueueShard<?>> queueShards, QueueConsumer<MessageDto> consumer) {
+    public MessageQueueService(List<QueueShard<?>> queueShards, List<QueueConsumer<MessageDto>> consumers) {
         super(queueShards, new LoggingThreadLifecycleListener(),
                 new LoggingTaskLifecycleListener());
-        this.consumer = consumer;
+        this.consumers = consumers;
     }
 
     @PostConstruct
     public void init() {
-        this.registerQueue(consumer);
+        consumers.forEach(this::registerQueue);
         this.start();
     }
 

@@ -1,6 +1,7 @@
 package com.example.consumer.job;
 
 import com.example.common.MessageDto;
+import lombok.Builder;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -12,11 +13,12 @@ import ru.yoomoney.tech.dbqueue.api.TaskPayloadTransformer;
 import ru.yoomoney.tech.dbqueue.settings.QueueConfig;
 
 import javax.annotation.Nonnull;
+import java.time.ZonedDateTime;
 import java.util.Optional;
 import java.util.concurrent.Executor;
 
 @Slf4j
-@Component
+@Builder
 @RequiredArgsConstructor
 public class MessageConsumer implements QueueConsumer<MessageDto> {
 
@@ -32,6 +34,8 @@ public class MessageConsumer implements QueueConsumer<MessageDto> {
     @Override
     public TaskExecutionResult execute(@Nonnull Task<MessageDto> task) {
         log.info("payload={}", task.getPayloadOrThrow());
+        ZonedDateTime sentAt = task.getCreatedAt();
+        ZonedDateTime receivedAt = ZonedDateTime.now(sentAt.getZone());
         return TaskExecutionResult.finish();
     }
 

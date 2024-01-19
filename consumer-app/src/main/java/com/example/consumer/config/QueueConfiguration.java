@@ -1,11 +1,15 @@
 package com.example.consumer.config;
 
 import com.example.common.MessageDto;
-import com.example.common.MessageTransformer;
+import com.example.common.transformer.MessageTransformer;
+import com.example.consumer.job.MessageConsumer;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.transaction.support.TransactionTemplate;
+import ru.yoomoney.tech.dbqueue.api.QueueConsumer;
 import ru.yoomoney.tech.dbqueue.api.TaskPayloadTransformer;
 import ru.yoomoney.tech.dbqueue.config.DatabaseAccessLayer;
 import ru.yoomoney.tech.dbqueue.config.DatabaseDialect;
@@ -26,16 +30,24 @@ import ru.yoomoney.tech.dbqueue.settings.ReenqueueRetryType;
 import ru.yoomoney.tech.dbqueue.settings.ReenqueueSettings;
 import ru.yoomoney.tech.dbqueue.spring.dao.SpringDatabaseAccessLayer;
 
+import javax.annotation.Nonnull;
 import java.time.Duration;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.concurrent.Executor;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 import java.util.concurrent.ForkJoinPool;
+import java.util.concurrent.ThreadFactory;
+import java.util.stream.IntStream;
 
 import static java.util.Collections.singletonList;
 
 @Configuration
 public class QueueConfiguration {
+
+    @Value("${system.corePoolSize}")
+    private int corePoolSize;
 
     @Bean
     public SpringDatabaseAccessLayer databaseAccessLayer(
@@ -100,7 +112,7 @@ public class QueueConfiguration {
     @Bean
     public QueueLocation queueLocation(QueueId queueId) {
         return QueueLocation.builder()
-                .withTableName("queue_tasks")
+                .withTableName("queue_tasks_h_8")
                 .withQueueId(queueId)
                 .build();
     }
@@ -117,9 +129,26 @@ public class QueueConfiguration {
     public TaskPayloadTransformer<MessageDto> transformer() {
         return MessageTransformer.getInstance();
     }
+//
+//    @Bean(name = "taskExecutor")
+//    public Executor taskExecutor() {
+//        return Executors.newFixedThreadPool(corePoolSize);
+//    }
 
-    @Bean(name = "taskExecutor")
-    public Executor taskExecutor() {
-        return new ForkJoinPool();
+    @Bean
+    public List<QueueConsumer<MessageDto>> consumers(
+            @Nonnull QueueConfig queueConfig,
+            @Qualifier("taskExecutor") @Nonnull Executor taskExecutor,
+            @Nonnull TaskPayloadTransformer<MessageDto> transformer
+    ) {
+        return IntStream.range(0, corePoolSize + 1).boxed()
+                .map(i ->
+                        (QueueConsumer<MessageDto>) MessageConsumer.builder()
+                                .queueConfig(queueConfig)
+                                .taskExecutor(taskExecutor)
+                                .transformer(transformer)
+                                .build()
+                )
+                .toList();
     }
 }

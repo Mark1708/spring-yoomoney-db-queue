@@ -1,7 +1,7 @@
 package com.example.producer.config;
 
 import com.example.common.MessageDto;
-import com.example.common.MessageTransformer;
+import com.example.common.transformer.MessageTransformer;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -98,7 +98,7 @@ public class QueueConfiguration {
     @Bean
     public QueueLocation queueLocation(QueueId queueId) {
         return QueueLocation.builder()
-                .withTableName("queue_tasks")
+                .withTableName("queue_tasks_h_8")
                 .withQueueId(queueId)
                 .build();
     }

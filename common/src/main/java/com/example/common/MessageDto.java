@@ -4,7 +4,7 @@ import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
 
-import java.util.UUID;
+import java.time.LocalDateTime;
 
 @Getter
 @Setter
@@ -12,12 +12,10 @@ import java.util.UUID;
 public class MessageDto {
 
     private String message;
-    private UUID sender;
-    private UUID receiver;
+    private LocalDateTime createdAt;
 
     public MessageDto(String message) {
         this.message = message;
-        this.sender = UUID.randomUUID();
-        this.receiver = UUID.randomUUID();
+        this.createdAt = LocalDateTime.now();
     }
 }
