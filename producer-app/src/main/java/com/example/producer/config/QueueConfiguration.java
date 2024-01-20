@@ -2,10 +2,15 @@ package com.example.producer.config;
 
 import com.example.common.MessageDto;
 import com.example.common.transformer.MessageTransformer;
+import com.example.producer.job.MessageProducer;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.scheduling.annotation.EnableAsync;
+import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import org.springframework.transaction.support.TransactionTemplate;
+import ru.yoomoney.tech.dbqueue.api.QueueProducer;
 import ru.yoomoney.tech.dbqueue.api.TaskPayloadTransformer;
 import ru.yoomoney.tech.dbqueue.config.DatabaseAccessLayer;
 import ru.yoomoney.tech.dbqueue.config.DatabaseDialect;
@@ -29,11 +34,17 @@ import ru.yoomoney.tech.dbqueue.spring.dao.SpringDatabaseAccessLayer;
 import java.time.Duration;
 import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.concurrent.Executor;
+import java.util.stream.IntStream;
 
 import static java.util.Collections.singletonList;
 
+@EnableAsync
 @Configuration
 public class QueueConfiguration {
+
+    @Value("${system.corePoolSize}")
+    private int corePoolSize;
 
     @Bean
     public SpringDatabaseAccessLayer databaseAccessLayer(
@@ -115,4 +126,34 @@ public class QueueConfiguration {
     public TaskPayloadTransformer<MessageDto> transformer() {
         return MessageTransformer.getInstance();
     }
+
+//    @Bean(name = "taskExecutor")
+//    public Executor taskExecutor() {
+//        ThreadPoolTaskExecutor executor = new ThreadPoolTaskExecutor();
+//        executor.setQueueCapacity(100);
+//        executor.setMaxPoolSize(corePoolSize);
+//        executor.setCorePoolSize(corePoolSize);
+//        executor.setThreadNamePrefix("poolThread-");
+//        executor.initialize();
+//        return executor;
+//    }
+
+//    @Bean
+//    public List<QueueProducer<MessageDto>> producers(
+//            QueueId queueId,
+//            QueueConfig config,
+//            List<QueueShard<?>> queueShards,
+//            TaskPayloadTransformer<MessageDto> transformer
+//    ) {
+//        return IntStream.range(0, corePoolSize + 1).boxed()
+//                .map(i ->
+//                        (QueueProducer<MessageDto>) new MessageProducer(
+//                                queueId,
+//                                config,
+//                                queueShards,
+//                                transformer
+//                        )
+//                )
+//                .toList();
+//    }
 }

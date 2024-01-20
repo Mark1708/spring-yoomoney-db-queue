@@ -23,13 +23,10 @@ public class MessageProducer extends MonitoringQueueProducer<MessageDto> {
             TaskPayloadTransformer<MessageDto> transformer
     ) {
         super(
-                new MonitoringQueueProducer<>(
-                        new ShardingQueueProducer<>(
-                                config,
-                                transformer,
-                                new SingleQueueShardRouter<>(queueShards.get(0))
-                        ),
-                        queueId
+                new ShardingQueueProducer<>(
+                        config,
+                        transformer,
+                        new SingleQueueShardRouter<>(queueShards.get(0))
                 ),
                 queueId
         );

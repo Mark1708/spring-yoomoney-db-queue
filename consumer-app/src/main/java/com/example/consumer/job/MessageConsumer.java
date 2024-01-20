@@ -16,6 +16,7 @@ import javax.annotation.Nonnull;
 import java.time.ZonedDateTime;
 import java.util.Optional;
 import java.util.concurrent.Executor;
+import java.util.concurrent.atomic.AtomicLong;
 
 @Slf4j
 @Builder
@@ -30,12 +31,17 @@ public class MessageConsumer implements QueueConsumer<MessageDto> {
     @Nonnull
     private final TaskPayloadTransformer<MessageDto> transformer;
 
+    private final AtomicLong messageCounter;
+    private final AtomicLong spentTimeCounter;
+
     @Nonnull
     @Override
     public TaskExecutionResult execute(@Nonnull Task<MessageDto> task) {
         log.info("payload={}", task.getPayloadOrThrow());
         ZonedDateTime sentAt = task.getCreatedAt();
         ZonedDateTime receivedAt = ZonedDateTime.now(sentAt.getZone());
+        messageCounter.incrementAndGet();
+        spentTimeCounter.addAndGet(receivedAt.toInstant().toEpochMilli() - sentAt.toInstant().toEpochMilli());
         return TaskExecutionResult.finish();
     }
 

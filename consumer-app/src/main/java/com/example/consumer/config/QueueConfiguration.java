@@ -8,6 +8,8 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.scheduling.annotation.EnableAsync;
+import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import org.springframework.transaction.support.TransactionTemplate;
 import ru.yoomoney.tech.dbqueue.api.QueueConsumer;
 import ru.yoomoney.tech.dbqueue.api.TaskPayloadTransformer;
@@ -39,15 +41,28 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ForkJoinPool;
 import java.util.concurrent.ThreadFactory;
+import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.atomic.AtomicLong;
 import java.util.stream.IntStream;
 
 import static java.util.Collections.singletonList;
 
+@EnableAsync
 @Configuration
 public class QueueConfiguration {
 
     @Value("${system.corePoolSize}")
     private int corePoolSize;
+
+    @Bean
+    public AtomicLong messageCounter() {
+        return new AtomicLong();
+    }
+
+    @Bean
+    public AtomicLong spentTimeCounter() {
+        return new AtomicLong();
+    }
 
     @Bean
     public SpringDatabaseAccessLayer databaseAccessLayer(
@@ -80,12 +95,12 @@ public class QueueConfiguration {
                 .withProcessingSettings(
                         ProcessingSettings.builder()
                                 .withProcessingMode(ProcessingMode.USE_EXTERNAL_EXECUTOR)
-                                .withThreadCount(1).
+                                .withThreadCount(corePoolSize).
                                 build()
                 )
                 .withPollSettings(
                         PollSettings.builder()
-                                .withBetweenTaskTimeout(Duration.ofMillis(100))
+                                .withBetweenTaskTimeout(Duration.ofMillis(1))
                                 .withNoTaskTimeout(Duration.ofMillis(100))
                                 .withFatalCrashTimeout(Duration.ofSeconds(1))
                                 .build()
@@ -129,11 +144,17 @@ public class QueueConfiguration {
     public TaskPayloadTransformer<MessageDto> transformer() {
         return MessageTransformer.getInstance();
     }
-//
-//    @Bean(name = "taskExecutor")
-//    public Executor taskExecutor() {
-//        return Executors.newFixedThreadPool(corePoolSize);
-//    }
+
+    @Bean(name = "taskExecutor")
+    public Executor taskExecutor() {
+        ThreadPoolTaskExecutor executor = new ThreadPoolTaskExecutor();
+        executor.setQueueCapacity(100);
+        executor.setMaxPoolSize(corePoolSize);
+        executor.setCorePoolSize(corePoolSize);
+        executor.setThreadNamePrefix("poolThread-");
+        executor.initialize();
+        return executor;
+    }
 
     @Bean
     public List<QueueConsumer<MessageDto>> consumers(
@@ -147,6 +168,8 @@ public class QueueConfiguration {
                                 .queueConfig(queueConfig)
                                 .taskExecutor(taskExecutor)
                                 .transformer(transformer)
+                                .messageCounter(messageCounter())
+                                .spentTimeCounter(spentTimeCounter())
                                 .build()
                 )
                 .toList();

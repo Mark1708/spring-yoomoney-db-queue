@@ -22,7 +22,7 @@ public class ProducerAppApplication {
     @Bean
     public CommandLineRunner CommandLineRunnerBean() {
         return (args) -> {
-            for (int i = 0; i < 5; i++) {
+            for (int i = 0; i < 2000; i++) {
                 producer.enqueue(
                         EnqueueParams.create(
                                 new MessageDto("Hello World " + i)
