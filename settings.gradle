@@ -1,6 +1,10 @@
 rootProject.name = 'spring-yoomoney-db-queue'
 
+include 'db-queue'
+include 'common'
+include 'spring-boot-starter-db-queue'
+
 include 'producer-app'
 include 'consumer-app'
-include 'common'
+include 'test-app'
 

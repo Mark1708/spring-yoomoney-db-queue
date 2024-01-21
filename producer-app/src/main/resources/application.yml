@@ -14,3 +14,11 @@ spring:
       maxLifetime: 1200000
   jpa:
     database-platform: org.hibernate.dialect.PostgreSQLDialect
+  db-queue:
+    enabled: true
+    config:
+      create_order:
+        location: queue_tasks_h_6
+        processingSettings:
+          processingMode: USE_EXTERNAL_EXECUTOR
+          thread-count: 1

@@ -1,12 +1,12 @@
 package com.example.producer.service;
 
+import com.example.dbqueue.config.QueueService;
+import com.example.dbqueue.config.QueueShard;
+import com.example.dbqueue.config.impl.LoggingTaskLifecycleListener;
+import com.example.dbqueue.config.impl.LoggingThreadLifecycleListener;
 import jakarta.annotation.PostConstruct;
 import jakarta.annotation.PreDestroy;
 import org.springframework.stereotype.Service;
-import ru.yoomoney.tech.dbqueue.config.QueueService;
-import ru.yoomoney.tech.dbqueue.config.QueueShard;
-import ru.yoomoney.tech.dbqueue.config.impl.LoggingTaskLifecycleListener;
-import ru.yoomoney.tech.dbqueue.config.impl.LoggingThreadLifecycleListener;
 
 import java.time.Duration;
 import java.util.List;

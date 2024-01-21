@@ -1,0 +1,52 @@
+package com.example.dbqueue.dao;
+
+import java.util.List;
+
+import com.example.dbqueue.api.EnqueueParams;
+import com.example.dbqueue.settings.QueueLocation;
+
+import javax.annotation.Nonnull;
+import java.time.Duration;
+
+/**
+ * Database access object to manage tasks in the queue.
+ */
+public interface QueueDao {
+    /**
+     * Add a new task in the queue for processing.
+     *
+     * @param location      Queue location.
+     * @param enqueueParams Parameters of the task
+     * @return Identifier (sequence id) of new inserted task.
+     */
+    long enqueue(@Nonnull QueueLocation location, @Nonnull EnqueueParams<String> enqueueParams);
+    
+    /**
+     * Add a new task in the queue for processing.
+     *
+     * @param location      Queue location.
+     * @param enqueueParams Parameters of the task
+     * @return Identifier (sequence id) of new inserted task.
+     */
+    void enqueueBatch(@Nonnull QueueLocation location, @Nonnull List<EnqueueParams<String>> enqueueParams);
+
+    /**
+     * Remove (delete) task from the queue.
+     *
+     * @param location Queue location.
+     * @param taskId   Identifier (sequence id) of the task.
+     * @return true, if task was deleted from database, false, when task with given id was not found.
+     */
+    boolean deleteTask(@Nonnull QueueLocation location, long taskId);
+
+    /**
+     * Postpone task processing for given time period (current date and time plus execution delay).
+     *
+     * @param location       Queue location.
+     * @param taskId         Identifier (sequence id) of the task.
+     * @param executionDelay Task execution delay.
+     * @return true, if task was successfully postponed, false, when task was not found.
+     */
+    boolean reenqueue(@Nonnull QueueLocation location, long taskId, @Nonnull Duration executionDelay);
+
+}

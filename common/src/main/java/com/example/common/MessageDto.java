@@ -1,23 +1,21 @@
 package com.example.common;
 
+import lombok.AllArgsConstructor;
+import lombok.Data;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
 
-import java.util.UUID;
+import java.io.Serializable;
+import java.time.LocalDateTime;
 
-@Getter
-@Setter
-@ToString
-public class MessageDto {
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
+public class MessageDto implements Serializable {
 
     private String message;
-    private UUID sender;
-    private UUID receiver;
+    private Long testId;
 
-    public MessageDto(String message) {
-        this.message = message;
-        this.sender = UUID.randomUUID();
-        this.receiver = UUID.randomUUID();
-    }
 }
