@@ -1,47 +1,38 @@
 package com.example.consumer.service;
 
 import com.example.common.MessageDto;
+import com.example.consumer.job.MessageConsumer;
+import com.example.dbqueue.api.QueueConsumer;
+import com.example.dbqueue.config.QueueService;
+import com.example.dbqueue.config.QueueShard;
+import com.example.dbqueue.config.impl.LoggingTaskLifecycleListener;
+import com.example.dbqueue.config.impl.LoggingThreadLifecycleListener;
 import jakarta.annotation.PostConstruct;
 import jakarta.annotation.PreDestroy;
 import org.springframework.stereotype.Service;
-import ru.yoomoney.tech.dbqueue.api.QueueConsumer;
-import ru.yoomoney.tech.dbqueue.config.QueueService;
-import ru.yoomoney.tech.dbqueue.config.QueueShard;
-import ru.yoomoney.tech.dbqueue.config.impl.LoggingTaskLifecycleListener;
-import ru.yoomoney.tech.dbqueue.config.impl.LoggingThreadLifecycleListener;
 
 import java.time.Duration;
 import java.util.List;
-import java.util.concurrent.atomic.AtomicLong;
 
 @Service
 public class MessageQueueService extends QueueService {
 
-    private final AtomicLong messageCounter;
-    private final AtomicLong spentTimeCounter;
-    private final List<QueueConsumer<MessageDto>> consumers;
+    private final QueueConsumer<MessageDto> consumer;
 
-    public MessageQueueService(List<QueueShard<?>> queueShards, AtomicLong messageCounter, AtomicLong spentTimeCounter, List<QueueConsumer<MessageDto>> consumers) {
+    public MessageQueueService(List<QueueShard<?>> queueShards, QueueConsumer<MessageDto> queueConsumer) {
         super(queueShards, new LoggingThreadLifecycleListener(),
                 new LoggingTaskLifecycleListener());
-        this.messageCounter = messageCounter;
-        this.spentTimeCounter = spentTimeCounter;
-        this.consumers = consumers;
+        this.consumer = queueConsumer;
     }
 
     @PostConstruct
     public void init() {
-        consumers.forEach(this::registerQueue);
+        this.registerQueue(consumer);
         this.start();
     }
 
     @PreDestroy
     public void destroy() {
-        System.out.println("====================================  Start Statistics  ====================================");
-        System.out.println("Messages: " + messageCounter.get());
-        System.out.println("Time: " + spentTimeCounter.get());
-        System.out.println("RPS: " +  messageCounter.get() /  spentTimeCounter.get() * 1000L);
-        System.out.println("====================================  End Statistics  ====================================");
         this.shutdown();
         this.awaitTermination(Duration.ofSeconds(10));
     }

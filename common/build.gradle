@@ -11,12 +11,8 @@ repositories {
 
 dependencies {
     implementation 'com.google.code.gson:gson:2.10.1'
-    implementation 'ru.yoomoney.tech:db-queue:15.0.0'
+    implementation project(':db-queue')
 
     compileOnly 'org.projectlombok:lombok:1.18.30'
     annotationProcessor 'org.projectlombok:lombok:1.18.30'
-}
-
-test {
-    useJUnitPlatform()
 }

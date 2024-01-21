@@ -1,22 +1,24 @@
 package com.example.consumer.job;
 
 import com.example.common.MessageDto;
+import com.example.common.Stat;
+import com.example.common.transformer.MessageTransformer;
+import com.example.dbqueue.api.QueueConsumer;
+import com.example.dbqueue.api.Task;
+import com.example.dbqueue.api.TaskExecutionResult;
+import com.example.dbqueue.api.TaskPayloadTransformer;
+import com.example.dbqueue.settings.QueueConfig;
+import jakarta.annotation.Nonnull;
 import lombok.Builder;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.stereotype.Component;
-import ru.yoomoney.tech.dbqueue.api.QueueConsumer;
-import ru.yoomoney.tech.dbqueue.api.Task;
-import ru.yoomoney.tech.dbqueue.api.TaskExecutionResult;
-import ru.yoomoney.tech.dbqueue.api.TaskPayloadTransformer;
-import ru.yoomoney.tech.dbqueue.settings.QueueConfig;
+import org.springframework.amqp.rabbit.core.RabbitTemplate;
 
-import javax.annotation.Nonnull;
-import java.time.ZonedDateTime;
+
+import java.time.LocalDateTime;
 import java.util.Optional;
 import java.util.concurrent.Executor;
-import java.util.concurrent.atomic.AtomicLong;
 
 @Slf4j
 @Builder
@@ -28,20 +30,16 @@ public class MessageConsumer implements QueueConsumer<MessageDto> {
     @Nonnull
     @Qualifier("taskExecutor")
     private final Executor taskExecutor;
-    @Nonnull
-    private final TaskPayloadTransformer<MessageDto> transformer;
+    private final RabbitTemplate rabbitTemplate;
 
-    private final AtomicLong messageCounter;
-    private final AtomicLong spentTimeCounter;
+    @Nonnull
+    private final static TaskPayloadTransformer<MessageDto> transformer = MessageTransformer.getInstance();
 
     @Nonnull
     @Override
     public TaskExecutionResult execute(@Nonnull Task<MessageDto> task) {
-        log.info("payload={}", task.getPayloadOrThrow());
-        ZonedDateTime sentAt = task.getCreatedAt();
-        ZonedDateTime receivedAt = ZonedDateTime.now(sentAt.getZone());
-        messageCounter.incrementAndGet();
-        spentTimeCounter.addAndGet(receivedAt.toInstant().toEpochMilli() - sentAt.toInstant().toEpochMilli());
+        Stat stat = new Stat(task.getPayloadOrThrow().getTestId(), task.getCreatedAt().toLocalDateTime(), LocalDateTime.now());
+        rabbitTemplate.convertAndSend("testExchange", "testRoutingKey", stat);
         return TaskExecutionResult.finish();
     }
 

@@ -1,14 +1,15 @@
 plugins {
     id 'java'
-    id 'org.springframework.boot' version '3.2.1'
+    id 'org.springframework.boot' version '3.2.2'
     id 'io.spring.dependency-management' version '1.1.4'
+    id 'org.graalvm.buildtools.native' version '0.9.28'
 }
 
 group = 'com.example'
 version = '0.0.1-SNAPSHOT'
 
 java {
-    sourceCompatibility = '17'
+    sourceCompatibility = '21'
 }
 
 configurations {
@@ -28,17 +29,17 @@ dependencies {
     runtimeOnly 'org.postgresql:postgresql'
 
     implementation project(':common')
+    implementation project(':db-queue')
+    implementation project(':spring-boot-starter-db-queue')
 
     compileOnly 'com.google.code.findbugs:jsr305:3.0.2'
-
-    implementation 'ru.yoomoney.tech:db-queue:15.0.0'
-
+    
     compileOnly 'org.projectlombok:lombok'
     annotationProcessor 'org.projectlombok:lombok'
     
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
 }
 
-tasks.named('test') {
-    useJUnitPlatform()
-}
+//tasks.named('test') {
+//    useJUnitPlatform()
+//}

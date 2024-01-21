@@ -1,9 +1,9 @@
 package com.example.common.transformer;
 
 import com.example.common.MessageDto;
+import com.example.dbqueue.api.TaskPayloadTransformer;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
-import ru.yoomoney.tech.dbqueue.api.TaskPayloadTransformer;
 
 import java.time.LocalDateTime;
 
@@ -13,7 +13,7 @@ public class MessageTransformer implements TaskPayloadTransformer<MessageDto> {
 
     private static final MessageTransformer INSTANCE = new MessageTransformer();
 
-    public static MessageTransformer getInstance() {
+    public static TaskPayloadTransformer<MessageDto> getInstance() {
         return INSTANCE;
     }
 

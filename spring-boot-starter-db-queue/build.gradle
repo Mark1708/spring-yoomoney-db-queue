@@ -1,0 +1,43 @@
+plugins {
+    id 'java'
+    id 'org.springframework.boot' version '3.2.2'
+    id 'io.spring.dependency-management' version '1.1.4'
+}
+
+group = 'com.example'
+version = '0.0.1'
+
+java {
+    sourceCompatibility = '21'
+}
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    def springVersion = '6.1.2'
+    def springBootVersion = '3.2.2'
+
+    implementation "org.springframework.boot:spring-boot:${springBootVersion}"
+    implementation "org.springframework.boot:spring-boot-autoconfigure:${springBootVersion}"
+    implementation "org.springframework.boot:spring-boot-configuration-processor:${springBootVersion}"
+
+    implementation "org.springframework:spring-jdbc:${springVersion}"
+    implementation "org.springframework:spring-tx:${springVersion}"
+
+    implementation project(':db-queue')
+
+    implementation 'org.slf4j:slf4j-api:1.7.36'
+
+    compileOnly 'com.google.code.findbugs:jsr305:3.0.1'
+}
+
+compileJava.dependsOn(processResources)
+bootJar {
+    enabled = false
+}
+
+jar {
+    enabled = true
+}
