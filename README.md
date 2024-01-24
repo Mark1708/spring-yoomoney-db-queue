@@ -76,5 +76,5 @@
 Выполнен [Гурьяновым Марком](https://mark1708.github.io/) под чутким руководством [kartzum](https://github.com/kartzum)
 #### +7(962)024-50-04 | mark1708.work@gmail.com | [github](http://github.com/Mark1708)
 
-![Readme Card](https://github-readme-stats.vercel.app/api/pin/?username=mark1708&repo=spring-yoomoney-db-queue&theme=chartreuse-dark&show_icons=true)
+![Readme Card](https://github-readme-stats.vercel.app/api/pin/?username=Mark1708&repo=spring-yoomoney-db-queue&theme=chartreuse-dark&show_icons=true)
 
