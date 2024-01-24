@@ -60,5 +60,21 @@
 Разработанный подход нашел успешное применение для решения задачи обработки сообщений с высокой нагрузкой, однако во многих случаях этого недостаточно. Тем не менее использование такого подхода по-прежнему распространено для решения ряда специфических задач.
 Дальнейшие исследования будут включать в себя эксперименты с настройками базы данных, конфигураций consumer/producer и масштабированием.
 
+## Технологии
+* Spring-Boot 3
+* Java 21
+* PostgreSQL
+* [db-queue](https://github.com/db-queue/db-queue)
 
+## Статус
+Проект _закончен_
+
+## Цель
+Проект сделан в образовательных целях
+
+## Контакты
+Выполнен [Гурьяновым Марком](https://mark1708.github.io/) под чутким руководством [kartzum](https://github.com/kartzum)
+#### +7(962)024-50-04 | mark1708.work@gmail.com | [github](http://github.com/Mark1708)
+
+![Readme Card](https://github-readme-stats.vercel.app/api/pin/?username=mark1708&repo=spring-yoomoney-db-queue&theme=chartreuse-dark&show_icons=true)
 
