@@ -9,11 +9,9 @@ import org.example.test.repository.TestRepository;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.client.RestClient;
 
-import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.concurrent.Executor;
@@ -32,53 +30,44 @@ public class TestController {
 
     private final TestRepository testRepository;
 
-    private final RestClient restClient = RestClient.builder()
-            .baseUrl("http://localhost:8080/")
-            .build();
-
-    private final RestClient restClient1 = RestClient.builder()
-            .baseUrl("http://localhost:8085/")
-            .build();
+    private final List<RestClient> restClients = List.of(
+                    "http://localhost:8080/",
+                    "http://localhost:8085/",
+                    "http://localhost:8088/"
+            )
+            .stream()
+            .map(url -> RestClient.builder()
+                    .baseUrl("http://localhost:8080/")
+                    .build())
+            .toList();
 
     @GetMapping
     public List<TestResult> tests() {
-        return testRepository.findAll().stream().map(test -> {return new TestResult(test);}).toList();
+        return testRepository.findAll().stream().map(TestResult::new).toList();
     }
 
     @PostMapping
-    public String startTest(@RequestParam Duration duration) {
+    public String startTest(Integer testDataCount) {
         if (isRunning) {
             return "Test is already running";
         }
         isRunning = true;
 
-        LocalDateTime startTime = LocalDateTime.now();
-        LocalDateTime endTime = startTime.plus(duration);
         Test test = saveTest(Test.builder().status(0).build());
         AtomicInteger count = new AtomicInteger(0);
-        taskExecutor.execute(() -> {
-            while (count.incrementAndGet() <= 500000) {
-                restClient.post()
-                        .contentType(APPLICATION_JSON)
-                        .body(
-                            new MessageDto("Hello " + LocalDateTime.now(), test.getId())
-                        )
-                        .retrieve()
-                        .toEntity(Void.class);
-            }
-            isRunning = false;
-        });
-        taskExecutor.execute(() -> {
-            while (count.incrementAndGet() <= 500000) {
-                restClient1.post()
-                        .contentType(APPLICATION_JSON)
-                        .body(
-                            new MessageDto("Hello " + LocalDateTime.now(), test.getId())
-                        )
-                        .retrieve()
-                        .toEntity(Void.class);
-            }
-            isRunning = false;
+        restClients.forEach(client -> {
+            taskExecutor.execute(() -> {
+                while (count.incrementAndGet() <= testDataCount) {
+                    client.post()
+                            .contentType(APPLICATION_JSON)
+                            .body(
+                                    new MessageDto("Hello " + LocalDateTime.now(), test.getId())
+                            )
+                            .retrieve()
+                            .toEntity(Void.class);
+                }
+                isRunning = false;
+            });
         });
         return "Successfully started test with id - " + test.getId();
     }

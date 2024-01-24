@@ -18,12 +18,12 @@ spring:
     enabled: true
     config:
       create_order:
-        location: queue_tasks_h_6
+        location: queue_tasks_h_8
         processingSettings:
           processingMode: USE_EXTERNAL_EXECUTOR
-          thread-count: 13
+          thread-count: 14
         poll-settings:
           between-task-timeout: PT0.01S # 10 MS
           no-task-timeout: PT0.1S
           fatal-crash-timeout: PT1S
-          batch-size: 20
+          batch-size: 10

@@ -18,7 +18,7 @@ spring:
     enabled: true
     config:
       create_order:
-        location: queue_tasks_h_6
+        location: queue_tasks_h_8
         processingSettings:
           processingMode: USE_EXTERNAL_EXECUTOR
           thread-count: 1
