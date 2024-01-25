@@ -42,3 +42,15 @@ dependencies {
 	testImplementation 'org.springframework.boot:spring-boot-starter-test'
 	testImplementation 'org.springframework.amqp:spring-rabbit-test'
 }
+
+graalvmNative {
+
+	binaries {
+		main {
+			imageName = "consumer-app"
+			mainClass = "com.example.consumer.ConsumerAppApplication"
+			buildArgs.add("--initialize-at-build-time=org.apache.commons.logging.LogFactoryService")
+			buildArgs.add("--initialize-at-build-time=org.apache.commons.logging.LogFactory")
+		}
+	}
+}

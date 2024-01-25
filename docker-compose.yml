@@ -1,6 +1,7 @@
 version: '3.7'
 services:
   db-queue:
+    container_name: db-queue
     image: postgres:latest
     restart: always
     environment:
@@ -18,6 +19,7 @@ services:
       - "./sql/create_tables.sql:/docker-entrypoint-initdb.d/create_tables.sql"
 
   test-db:
+    container_name: test-db
     image: postgres:latest
     restart: always
     environment:
@@ -35,6 +37,7 @@ services:
 
 
   rabbit-mq:
+    container_name: rabbit-mq
     image: rabbitmq:3-management-alpine
     environment:
       RABBITMQ_DEFAULT_USER: user
@@ -42,6 +45,45 @@ services:
     ports:
       - "5672:5672"
       - "15672:15672"
+
+  consumer-app:
+    container_name: consumer-app
+    image: ghcr.io/mark1708/consumer-app:t8
+    environment:
+      - DB_URL=jdbc:postgresql://db-queue:5432/test
+      - DB_USERNAME=postgres
+      - DB_PASSWORD=postgres
+    depends_on:
+      - db-queue
+      - rabbit-mq
+    ports:
+      - '8090:8080'
+
+  producer-app:
+    container_name: producer-app
+    image: ghcr.io/mark1708/producer-app:t8
+    environment:
+      - DB_URL=jdbc:postgresql://db-queue:5432/test
+      - DB_USERNAME=postgres
+      - DB_PASSWORD=postgres
+    depends_on:
+      - db-queue
+    ports:
+      - '8070:8080'
+
+  test-app:
+    container_name: test-app
+    image: ghcr.io/mark1708/test-app:v1.0.0
+    environment:
+      - DB_URL=jdbc:postgresql://test-db:5432/test
+      - DB_USERNAME=postgres
+      - DB_PASSWORD=postgres
+      - PRODUCERS_URLS=http://producer-app:8070,http://producer-app:8070
+    depends_on:
+      - test-db
+      - producer-app
+    ports:
+      - '8080:8080'
 
 volumes:
   postgres-data-1:

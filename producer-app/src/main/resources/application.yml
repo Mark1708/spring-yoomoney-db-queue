@@ -22,3 +22,6 @@ spring:
         processingSettings:
           processingMode: USE_EXTERNAL_EXECUTOR
           thread-count: 1
+  threads:
+    virtual:
+      enabled: true

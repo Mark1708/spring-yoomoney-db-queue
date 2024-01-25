@@ -1,5 +1,5 @@
 server:
-  port: 8082
+  port: 8080
 
 spring:
   application:
@@ -14,3 +14,5 @@ spring:
       maxLifetime: 1200000
   jpa:
     database-platform: org.hibernate.dialect.PostgreSQLDialect
+
+producers: ${PRODUCERS_URLS}

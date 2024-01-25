@@ -40,6 +40,14 @@ dependencies {
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
 }
 
-//tasks.named('test') {
-//    useJUnitPlatform()
-//}
+graalvmNative {
+
+    binaries {
+        main {
+            imageName = "producer-app"
+            mainClass = "com.example.producer.ProducerAppApplication"
+            buildArgs.add("--initialize-at-build-time=org.apache.commons.logging.LogFactoryService")
+            buildArgs.add("--initialize-at-build-time=org.apache.commons.logging.LogFactory")
+        }
+    }
+}

@@ -1,5 +1,5 @@
 server:
-  port: 8081
+  port: 8080
 
 spring:
   application:
@@ -27,3 +27,6 @@ spring:
           no-task-timeout: PT0.1S
           fatal-crash-timeout: PT1S
           batch-size: 10
+  threads:
+    virtual:
+      enabled: true
