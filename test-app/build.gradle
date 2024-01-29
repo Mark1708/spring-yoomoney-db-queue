@@ -2,7 +2,6 @@ plugins {
     id 'java'
     id 'org.springframework.boot' version '3.2.2'
     id 'io.spring.dependency-management' version '1.1.4'
-    id 'org.graalvm.buildtools.native' version '0.9.28'
 }
 
 group = 'org.example'
@@ -40,14 +39,7 @@ dependencies {
     testImplementation 'org.springframework.amqp:spring-rabbit-test'
 }
 
-graalvmNative {
-    binaries {
-        main {
-            imageName = "test-app"
-            mainClass = "org.example.test.TestAppApplication"
-            buildArgs.add("--initialize-at-build-time=org.apache.commons.logging.LogFactoryService")
-            buildArgs.add("--initialize-at-build-time=org.apache.commons.logging.LogFactory")
-        }
-    }
+bootBuildImage {
+    imageName='ghcr.io/mark1708/test-app'
 }
 

@@ -14,5 +14,10 @@ spring:
       maxLifetime: 1200000
   jpa:
     database-platform: org.hibernate.dialect.PostgreSQLDialect
+  rabbitmq:
+    host: ${RABBIT_HOST}
+    port: ${RABBIT_PORT}
+    password: ${RABBIT_PASS}
+    username: ${RABBIT_USER}
 
 producers: ${PRODUCERS_URLS}

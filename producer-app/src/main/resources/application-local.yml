@@ -7,3 +7,8 @@ spring:
     url: jdbc:postgresql://localhost:5432/test
     username: postgres
     password: postgres
+  db-queue:
+    enabled: true
+    config:
+      create_order:
+        location: queue_tasks_4

@@ -5,9 +5,9 @@ services:
     image: postgres:latest
     restart: always
     environment:
-      - POSTGRES_USER=postgres
-      - POSTGRES_PASSWORD=postgres
-      - POSTGRES_DB=test
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: test
     logging:
       options:
         max-size: 10m
@@ -23,9 +23,9 @@ services:
     image: postgres:latest
     restart: always
     environment:
-      - POSTGRES_USER=postgres
-      - POSTGRES_PASSWORD=postgres
-      - POSTGRES_DB=test
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: test
     logging:
       options:
         max-size: 10m
@@ -48,11 +48,16 @@ services:
 
   consumer-app:
     container_name: consumer-app
-    image: ghcr.io/mark1708/consumer-app:t8
+    image: ghcr.io/mark1708/consumer-app
     environment:
-      - DB_URL=jdbc:postgresql://db-queue:5432/test
-      - DB_USERNAME=postgres
-      - DB_PASSWORD=postgres
+      DB_URL: jdbc:postgresql://db-queue:5432/test
+      DB_USERNAME: postgres
+      DB_PASSWORD: postgres
+      RABBIT_HOST: rabbit-mq
+      RABBIT_PORT: 5672
+      RABBIT_USER: user
+      RABBIT_PASS: password
+      DB_QUEUE_LOCATION: queue_tasks_1
     depends_on:
       - db-queue
       - rabbit-mq
@@ -61,11 +66,12 @@ services:
 
   producer-app:
     container_name: producer-app
-    image: ghcr.io/mark1708/producer-app:t8
+    image: ghcr.io/mark1708/producer-app:latest
     environment:
-      - DB_URL=jdbc:postgresql://db-queue:5432/test
-      - DB_USERNAME=postgres
-      - DB_PASSWORD=postgres
+      DB_URL: jdbc:postgresql://db-queue:5432/test
+      DB_USERNAME: postgres
+      DB_PASSWORD: postgres
+      DB_QUEUE_LOCATION: queue_tasks_1
     depends_on:
       - db-queue
     ports:
@@ -73,12 +79,16 @@ services:
 
   test-app:
     container_name: test-app
-    image: ghcr.io/mark1708/test-app:v1.0.0
+    image: ghcr.io/mark1708/test-app:latest
     environment:
-      - DB_URL=jdbc:postgresql://test-db:5432/test
-      - DB_USERNAME=postgres
-      - DB_PASSWORD=postgres
-      - PRODUCERS_URLS=http://producer-app:8070,http://producer-app:8070
+      DB_URL: jdbc:postgresql://test-db:5432/test
+      DB_USERNAME: postgres
+      DB_PASSWORD: postgres
+      RABBIT_HOST: rabbit-mq
+      RABBIT_PORT: 5672
+      RABBIT_USER: user
+      RABBIT_PASS: password
+      PRODUCERS_URLS: http://producer-app:8080
     depends_on:
       - test-db
       - producer-app

@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.client.RestClient;
 
 import java.time.LocalDateTime;
+import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.Executor;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -31,8 +32,8 @@ public class TestController {
 
     private final TestRepository testRepository;
 
-    @Value("#{'${producers}'.split(',')}")
-    private final List<String> producers;
+    @Value("${producers}")
+    private String producers;
 
     @GetMapping
     public List<TestResult> tests() {
@@ -41,7 +42,7 @@ public class TestController {
 
     @PostMapping
     public String startTest(Integer testDataCount) {
-        List<RestClient> restClients = producers.stream()
+        List<RestClient> restClients = Arrays.stream(producers.split(","))
                 .map(url -> RestClient.builder()
                         .baseUrl(url)
                         .build())
@@ -56,6 +57,7 @@ public class TestController {
         restClients.forEach(client -> {
             taskExecutor.execute(() -> {
                 while (count.incrementAndGet() <= testDataCount) {
+
                     client.post()
                             .contentType(APPLICATION_JSON)
                             .body(

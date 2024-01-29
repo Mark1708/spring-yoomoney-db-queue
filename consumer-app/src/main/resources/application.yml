@@ -18,7 +18,7 @@ spring:
     enabled: true
     config:
       create_order:
-        location: queue_tasks_h_8
+        location: ${DB_QUEUE_LOCATION}
         processingSettings:
           processingMode: USE_EXTERNAL_EXECUTOR
           thread-count: 14
@@ -27,6 +27,11 @@ spring:
           no-task-timeout: PT0.1S
           fatal-crash-timeout: PT1S
           batch-size: 10
+  rabbitmq:
+    host: ${RABBIT_HOST}
+    port: ${RABBIT_PORT}
+    password: ${RABBIT_PASS}
+    username: ${RABBIT_USER}
   threads:
     virtual:
       enabled: true
