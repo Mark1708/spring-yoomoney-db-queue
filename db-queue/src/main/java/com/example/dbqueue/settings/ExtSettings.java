@@ -1,6 +1,5 @@
 package com.example.dbqueue.settings;
 
-import javax.annotation.Nonnull;
 import java.time.Duration;
 import java.util.Collection;
 import java.util.LinkedHashSet;
@@ -8,6 +7,7 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.StringJoiner;
 import java.util.function.BiFunction;
+import javax.annotation.Nonnull;
 
 /**
  * Additional custom settings
@@ -40,7 +40,8 @@ public class ExtSettings extends DynamicSetting<ExtSettings> {
             entriesInOld.removeAll(newValue.extSettings.keySet());
 
             StringJoiner diff = new StringJoiner(",", getName() + '(', ")");
-            sameEntries.forEach(key -> diff.add(key + '=' + newValue.extSettings.get(key) + '<' + oldValue.extSettings.get(key)));
+            sameEntries.forEach(
+                    key -> diff.add(key + '=' + newValue.extSettings.get(key) + '<' + oldValue.extSettings.get(key)));
             entriesInNew.forEach(key -> diff.add(key + '=' + newValue.extSettings.get(key) + '<' + null));
             entriesInOld.forEach(key -> diff.add(key + '=' + null + '<' + oldValue.extSettings.get(key)));
             return diff.toString();
@@ -78,7 +79,8 @@ public class ExtSettings extends DynamicSetting<ExtSettings> {
     @Nonnull
     public String getProperty(@Nonnull String settingName) {
         Objects.requireNonNull(settingName);
-        return Objects.requireNonNull(extSettings.get(settingName),
+        return Objects.requireNonNull(
+                extSettings.get(settingName),
                 String.format("null values are not allowed: settingName=%s", settingName));
     }
 
@@ -98,7 +100,6 @@ public class ExtSettings extends DynamicSetting<ExtSettings> {
     public int hashCode() {
         return Objects.hash(extSettings);
     }
-
 
     @Override
     public String toString() {
@@ -120,8 +121,7 @@ public class ExtSettings extends DynamicSetting<ExtSettings> {
     public static class Builder {
         private Map<String, String> extSettings;
 
-        private Builder() {
-        }
+        private Builder() {}
 
         public Builder withSettings(@Nonnull Map<String, String> extSettings) {
             this.extSettings = extSettings;

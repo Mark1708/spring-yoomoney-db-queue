@@ -1,9 +1,8 @@
 package com.example.dbqueue.api;
 
 import com.example.dbqueue.config.QueueShardId;
-
-import javax.annotation.Nonnull;
 import java.util.Objects;
+import javax.annotation.Nonnull;
 
 /**
  * Task enqueue result
@@ -11,6 +10,7 @@ import java.util.Objects;
 public class EnqueueResult {
     @Nonnull
     private final QueueShardId shardId;
+
     @Nonnull
     private final Long enqueueId;
 
@@ -47,10 +47,7 @@ public class EnqueueResult {
 
     @Override
     public String toString() {
-        return "EnqueueResult{" +
-                "shardId=" + shardId +
-                ", enqueueId=" + enqueueId +
-                '}';
+        return "EnqueueResult{" + "shardId=" + shardId + ", enqueueId=" + enqueueId + '}';
     }
 
     @Override
@@ -87,8 +84,7 @@ public class EnqueueResult {
         private QueueShardId shardId;
         private Long enqueueId;
 
-        private Builder() {
-        }
+        private Builder() {}
 
         /**
          * Set shard identifier of added task

@@ -1,7 +1,7 @@
 package com.example.dbqueue.settings;
 
-import javax.annotation.Nonnull;
 import java.util.Objects;
+import javax.annotation.Nonnull;
 
 /**
  * Queue configuration with database table location and task processing settings.
@@ -10,6 +10,7 @@ public final class QueueConfig {
 
     @Nonnull
     private final QueueLocation location;
+
     @Nonnull
     private final QueueSettings settings;
 
@@ -19,8 +20,7 @@ public final class QueueConfig {
      * @param location Queue location
      * @param settings Queue settings
      */
-    public QueueConfig(@Nonnull QueueLocation location,
-                       @Nonnull QueueSettings settings) {
+    public QueueConfig(@Nonnull QueueLocation location, @Nonnull QueueSettings settings) {
         this.location = Objects.requireNonNull(location, "location must not be null");
         this.settings = Objects.requireNonNull(settings, "settings must not be null");
     }
@@ -47,10 +47,7 @@ public final class QueueConfig {
 
     @Override
     public String toString() {
-        return '{' +
-                "location=" + location +
-                ", settings=" + settings +
-                '}';
+        return '{' + "location=" + location + ", settings=" + settings + '}';
     }
 
     @Override
@@ -62,8 +59,7 @@ public final class QueueConfig {
             return false;
         }
         QueueConfig that = (QueueConfig) obj;
-        return Objects.equals(location, that.location) &&
-                Objects.equals(settings, that.settings);
+        return Objects.equals(location, that.location) && Objects.equals(settings, that.settings);
     }
 
     @Override

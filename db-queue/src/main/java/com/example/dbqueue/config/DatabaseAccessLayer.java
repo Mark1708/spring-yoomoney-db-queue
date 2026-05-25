@@ -5,9 +5,8 @@ import com.example.dbqueue.dao.QueuePickTaskDao;
 import com.example.dbqueue.settings.FailureSettings;
 import com.example.dbqueue.settings.PollSettings;
 import com.example.dbqueue.settings.QueueLocation;
-
-import javax.annotation.Nonnull;
 import java.util.function.Supplier;
+import javax.annotation.Nonnull;
 
 /**
  * Interface for interacting with database
@@ -34,8 +33,7 @@ public interface DatabaseAccessLayer {
     QueuePickTaskDao createQueuePickTaskDao(
             @Nonnull QueueLocation queueLocation,
             @Nonnull FailureSettings failureSettings,
-            @Nonnull PollSettings pollSettings
-    );
+            @Nonnull PollSettings pollSettings);
 
     /**
      * Perform an operation in transaction
@@ -60,5 +58,4 @@ public interface DatabaseAccessLayer {
      */
     @Nonnull
     QueueTableSchema getQueueTableSchema();
-
 }

@@ -1,7 +1,7 @@
 package com.example.dbqueue.settings;
 
-import javax.annotation.Nonnull;
 import java.util.Objects;
+import javax.annotation.Nonnull;
 
 /**
  * Queue identifier.

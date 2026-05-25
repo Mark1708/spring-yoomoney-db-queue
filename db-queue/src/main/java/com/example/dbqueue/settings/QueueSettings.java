@@ -1,7 +1,7 @@
 package com.example.dbqueue.settings;
 
-import javax.annotation.Nonnull;
 import java.util.Objects;
+import javax.annotation.Nonnull;
 
 /**
  * Queue settings
@@ -10,12 +10,16 @@ public final class QueueSettings {
 
     @Nonnull
     private final ProcessingSettings processingSettings;
+
     @Nonnull
     private final PollSettings pollSettings;
+
     @Nonnull
     private final FailureSettings failureSettings;
+
     @Nonnull
     private final ReenqueueSettings reenqueueSettings;
+
     @Nonnull
     private final ExtSettings extSettings;
 
@@ -101,8 +105,10 @@ public final class QueueSettings {
             return false;
         }
         QueueSettings that = (QueueSettings) obj;
-        return processingSettings.equals(that.processingSettings) && pollSettings.equals(that.pollSettings) &&
-                failureSettings.equals(that.failureSettings) && reenqueueSettings.equals(that.reenqueueSettings)
+        return processingSettings.equals(that.processingSettings)
+                && pollSettings.equals(that.pollSettings)
+                && failureSettings.equals(that.failureSettings)
+                && reenqueueSettings.equals(that.reenqueueSettings)
                 && extSettings.equals(that.extSettings);
     }
 
@@ -113,13 +119,12 @@ public final class QueueSettings {
 
     @Override
     public String toString() {
-        return "{" +
-                "processingSettings=" + processingSettings +
-                ", pollSettings=" + pollSettings +
-                ", failureSettings=" + failureSettings +
-                ", reenqueueSettings=" + reenqueueSettings +
-                ", additionalSettings=" + extSettings +
-                '}';
+        return "{" + "processingSettings="
+                + processingSettings + ", pollSettings="
+                + pollSettings + ", failureSettings="
+                + failureSettings + ", reenqueueSettings="
+                + reenqueueSettings + ", additionalSettings="
+                + extSettings + '}';
     }
 
     /**
@@ -132,8 +137,7 @@ public final class QueueSettings {
         private ReenqueueSettings reenqueueSettings;
         private ExtSettings extSettings;
 
-        private Builder() {
-        }
+        private Builder() {}
 
         /**
          * Sets task processing settings.

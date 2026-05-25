@@ -1,18 +1,18 @@
 package com.example.dbqueue.settings;
 
-import javax.annotation.Nonnull;
+import static com.example.dbqueue.settings.QueueConfigsReader.SETTING_RETRY_INTERVAL;
+import static com.example.dbqueue.settings.QueueConfigsReader.SETTING_RETRY_TYPE;
+import static com.example.dbqueue.settings.QueueConfigsReader.VALUE_TASK_RETRY_TYPE_ARITHMETIC;
+import static com.example.dbqueue.settings.QueueConfigsReader.VALUE_TASK_RETRY_TYPE_GEOMETRIC;
+import static com.example.dbqueue.settings.QueueConfigsReader.VALUE_TASK_RETRY_TYPE_LINEAR;
+
 import java.time.Duration;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.function.Supplier;
-
-import static com.example.dbqueue.settings.QueueConfigsReader.SETTING_RETRY_INTERVAL;
-import static com.example.dbqueue.settings.QueueConfigsReader.SETTING_RETRY_TYPE;
-import static com.example.dbqueue.settings.QueueConfigsReader.VALUE_TASK_RETRY_TYPE_ARITHMETIC;
-import static com.example.dbqueue.settings.QueueConfigsReader.VALUE_TASK_RETRY_TYPE_GEOMETRIC;
-import static com.example.dbqueue.settings.QueueConfigsReader.VALUE_TASK_RETRY_TYPE_LINEAR;
+import javax.annotation.Nonnull;
 
 /**
  * Parser for {@link FailureSettings}
@@ -28,8 +28,8 @@ class FailureSettingsParser {
      * @param defaultSettings default settings
      * @param errorMessages   list of error messages
      */
-    FailureSettingsParser(@Nonnull Supplier<FailureSettings.Builder> defaultSettings,
-                          @Nonnull List<String> errorMessages) {
+    FailureSettingsParser(
+            @Nonnull Supplier<FailureSettings.Builder> defaultSettings, @Nonnull List<String> errorMessages) {
         this.defaultSettings = Objects.requireNonNull(defaultSettings, "defaultSettings");
         this.errorMessages = Objects.requireNonNull(errorMessages, "errorMessages");
     }
@@ -49,7 +49,8 @@ class FailureSettingsParser {
             settings.forEach((key, value) -> fillSettings(failureSettings, key, value));
             return Optional.of(failureSettings.build());
         } catch (RuntimeException exc) {
-            errorMessages.add(String.format("cannot build failure settings: queueId=%s, msg=%s", queueId, exc.getMessage()));
+            errorMessages.add(
+                    String.format("cannot build failure settings: queueId=%s, msg=%s", queueId, exc.getMessage()));
             return Optional.empty();
         }
     }
@@ -59,12 +60,12 @@ class FailureSettingsParser {
             switch (name) {
                 case SETTING_RETRY_TYPE -> failureSettings.withRetryType(parseRetryType(value));
                 case SETTING_RETRY_INTERVAL -> failureSettings.withRetryInterval(Duration.parse(value));
-                default -> {
-                }
+                default -> {}
             }
         } catch (RuntimeException exc) {
-            errorMessages.add(String.format("cannot parse setting: name=%s, value=%s, exception=%s", name, value,
-                    exc.getClass().getSimpleName() + '(' + exc.getMessage() + ')'));
+            errorMessages.add(String.format(
+                    "cannot parse setting: name=%s, value=%s, exception=%s",
+                    name, value, exc.getClass().getSimpleName() + '(' + exc.getMessage() + ')'));
         }
     }
 
@@ -76,6 +77,4 @@ class FailureSettingsParser {
             default -> throw new IllegalArgumentException(String.format("unknown retry type: name=%s", name));
         };
     }
-
-
 }

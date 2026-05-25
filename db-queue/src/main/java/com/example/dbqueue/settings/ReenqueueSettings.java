@@ -1,12 +1,12 @@
 package com.example.dbqueue.settings;
 
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
 import java.time.Duration;
 import java.util.List;
 import java.util.Objects;
 import java.util.StringJoiner;
 import java.util.function.BiFunction;
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 
 /**
  * Settings for the task postponing strategy
@@ -32,12 +32,13 @@ public class ReenqueueSettings extends DynamicSetting<ReenqueueSettings> {
     @Nullable
     private Long geometricRatio;
 
-    private ReenqueueSettings(@Nonnull ReenqueueRetryType retryType,
-                              @Nullable List<Duration> sequentialPlan,
-                              @Nullable Duration fixedDelay,
-                              @Nullable Duration initialDelay,
-                              @Nullable Duration arithmeticStep,
-                              @Nullable Long geometricRatio) {
+    private ReenqueueSettings(
+            @Nonnull ReenqueueRetryType retryType,
+            @Nullable List<Duration> sequentialPlan,
+            @Nullable Duration fixedDelay,
+            @Nullable Duration initialDelay,
+            @Nullable Duration arithmeticStep,
+            @Nullable Long geometricRatio) {
         this.retryType = Objects.requireNonNull(retryType, "retryType must not be null");
         this.sequentialPlan = sequentialPlan;
         this.fixedDelay = fixedDelay;
@@ -53,8 +54,8 @@ public class ReenqueueSettings extends DynamicSetting<ReenqueueSettings> {
                     "fixedDelay must not be empty when retryType=" + ReenqueueRetryType.FIXED);
         }
         if (retryType == ReenqueueRetryType.ARITHMETIC && (arithmeticStep == null || initialDelay == null)) {
-            throw new IllegalArgumentException(
-                    "arithmeticStep and initialDelay must not be empty when retryType=" + ReenqueueRetryType.ARITHMETIC);
+            throw new IllegalArgumentException("arithmeticStep and initialDelay must not be empty when retryType="
+                    + ReenqueueRetryType.ARITHMETIC);
         }
         if (retryType == ReenqueueRetryType.GEOMETRIC && (geometricRatio == null || initialDelay == null)) {
             throw new IllegalArgumentException(
@@ -154,14 +155,13 @@ public class ReenqueueSettings extends DynamicSetting<ReenqueueSettings> {
 
     @Override
     public String toString() {
-        return "{" +
-                "retryType=" + retryType +
-                ", sequentialPlan=" + sequentialPlan +
-                ", fixedDelay=" + fixedDelay +
-                ", initialDelay=" + initialDelay +
-                ", arithmeticStep=" + arithmeticStep +
-                ", geometricRatio=" + geometricRatio +
-                '}';
+        return "{" + "retryType="
+                + retryType + ", sequentialPlan="
+                + sequentialPlan + ", fixedDelay="
+                + fixedDelay + ", initialDelay="
+                + initialDelay + ", arithmeticStep="
+                + arithmeticStep + ", geometricRatio="
+                + geometricRatio + '}';
     }
 
     @Override
@@ -173,11 +173,12 @@ public class ReenqueueSettings extends DynamicSetting<ReenqueueSettings> {
             return false;
         }
         ReenqueueSettings that = (ReenqueueSettings) obj;
-        return retryType == that.retryType && Objects.equals(sequentialPlan, that.sequentialPlan) &&
-                Objects.equals(fixedDelay, that.fixedDelay) &&
-                Objects.equals(initialDelay, that.initialDelay) &&
-                Objects.equals(arithmeticStep, that.arithmeticStep) &&
-                Objects.equals(geometricRatio, that.geometricRatio);
+        return retryType == that.retryType
+                && Objects.equals(sequentialPlan, that.sequentialPlan)
+                && Objects.equals(fixedDelay, that.fixedDelay)
+                && Objects.equals(initialDelay, that.initialDelay)
+                && Objects.equals(arithmeticStep, that.arithmeticStep)
+                && Objects.equals(geometricRatio, that.geometricRatio);
     }
 
     @Override
@@ -202,28 +203,22 @@ public class ReenqueueSettings extends DynamicSetting<ReenqueueSettings> {
         return (oldVal, newVal) -> {
             StringJoiner diff = new StringJoiner(",", getName() + '(', ")");
             if (oldVal.retryType != newVal.retryType) {
-                diff.add("type=" +
-                        newVal.retryType + '<' + oldVal.retryType);
+                diff.add("type=" + newVal.retryType + '<' + oldVal.retryType);
             }
             if (!Objects.equals(oldVal.arithmeticStep, newVal.arithmeticStep)) {
-                diff.add("arithmeticStep=" +
-                        newVal.arithmeticStep + '<' + oldVal.arithmeticStep);
+                diff.add("arithmeticStep=" + newVal.arithmeticStep + '<' + oldVal.arithmeticStep);
             }
             if (!Objects.equals(oldVal.geometricRatio, newVal.geometricRatio)) {
-                diff.add("geometricRatio=" +
-                        newVal.geometricRatio + '<' + oldVal.geometricRatio);
+                diff.add("geometricRatio=" + newVal.geometricRatio + '<' + oldVal.geometricRatio);
             }
             if (!Objects.equals(oldVal.initialDelay, newVal.initialDelay)) {
-                diff.add("initialDelay=" +
-                        newVal.initialDelay + '<' + oldVal.initialDelay);
+                diff.add("initialDelay=" + newVal.initialDelay + '<' + oldVal.initialDelay);
             }
             if (!Objects.equals(oldVal.fixedDelay, newVal.fixedDelay)) {
-                diff.add("fixedDelay=" +
-                        newVal.fixedDelay + '<' + oldVal.fixedDelay);
+                diff.add("fixedDelay=" + newVal.fixedDelay + '<' + oldVal.fixedDelay);
             }
             if (!Objects.equals(oldVal.sequentialPlan, newVal.sequentialPlan)) {
-                diff.add("sequentialPlan=" +
-                        newVal.sequentialPlan + '<' + oldVal.sequentialPlan);
+                diff.add("sequentialPlan=" + newVal.sequentialPlan + '<' + oldVal.sequentialPlan);
             }
             return diff.toString();
         };
@@ -295,7 +290,8 @@ public class ReenqueueSettings extends DynamicSetting<ReenqueueSettings> {
 
         @Nonnull
         public ReenqueueSettings build() {
-            return new ReenqueueSettings(retryType, sequentialPlan, fixedDelay, initialDelay, arithmeticStep, geometricRatio);
+            return new ReenqueueSettings(
+                    retryType, sequentialPlan, fixedDelay, initialDelay, arithmeticStep, geometricRatio);
         }
     }
 }

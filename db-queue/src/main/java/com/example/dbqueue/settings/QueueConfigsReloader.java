@@ -1,14 +1,13 @@
 package com.example.dbqueue.settings;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import com.example.dbqueue.config.QueueService;
-
-import javax.annotation.Nonnull;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.stream.Collectors;
+import javax.annotation.Nonnull;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Dynamic reload of queue configuration.
@@ -21,8 +20,10 @@ public class QueueConfigsReloader {
 
     @Nonnull
     private final QueueConfigsReader queueConfigsReader;
+
     @Nonnull
     private final QueueService queueService;
+
     @Nonnull
     private final List<FileWatcher> fileWatchers;
 
@@ -32,8 +33,7 @@ public class QueueConfigsReloader {
      * @param queueConfigsReader queue configuration parser
      * @param queueService       queue service
      */
-    public QueueConfigsReloader(@Nonnull QueueConfigsReader queueConfigsReader,
-                                @Nonnull QueueService queueService) {
+    public QueueConfigsReloader(@Nonnull QueueConfigsReader queueConfigsReader, @Nonnull QueueService queueService) {
         this.queueConfigsReader = Objects.requireNonNull(queueConfigsReader, "queueConfigsReader");
         this.queueService = Objects.requireNonNull(queueService, "queueService");
         this.fileWatchers = queueConfigsReader.getConfigPaths().stream()

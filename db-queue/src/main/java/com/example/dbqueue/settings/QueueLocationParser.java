@@ -1,10 +1,10 @@
 package com.example.dbqueue.settings;
 
-import javax.annotation.Nonnull;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
+import javax.annotation.Nonnull;
 
 /**
  * Parser for {@link QueueLocation}
@@ -38,7 +38,8 @@ class QueueLocationParser {
             settings.forEach((key, value) -> fillSettings(queueLocation, key, value));
             return Optional.of(queueLocation.build());
         } catch (RuntimeException exc) {
-            errorMessages.add(String.format("cannot build queue location: queueId=%s, msg=%s", queueId, exc.getMessage()));
+            errorMessages.add(
+                    String.format("cannot build queue location: queueId=%s, msg=%s", queueId, exc.getMessage()));
             return Optional.empty();
         }
     }
@@ -48,13 +49,12 @@ class QueueLocationParser {
             switch (name) {
                 case QueueConfigsReader.SETTING_TABLE -> queueLocation.withTableName(value);
                 case QueueConfigsReader.SETTING_ID_SEQUENCE -> queueLocation.withIdSequence(value);
-                default -> {
-                }
+                default -> {}
             }
         } catch (RuntimeException exc) {
-            errorMessages.add(String.format("cannot parse setting: name=%s, value=%s, exception=%s", name, value,
-                    exc.getClass().getSimpleName() + '(' + exc.getMessage() + ')'));
+            errorMessages.add(String.format(
+                    "cannot parse setting: name=%s, value=%s, exception=%s",
+                    name, value, exc.getClass().getSimpleName() + '(' + exc.getMessage() + ')'));
         }
     }
-
 }

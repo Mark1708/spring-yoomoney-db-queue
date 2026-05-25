@@ -1,5 +1,7 @@
 package com.example.dbqueue.internal.runner;
 
+import static java.util.Objects.requireNonNull;
+
 import com.example.dbqueue.api.QueueConsumer;
 import com.example.dbqueue.config.QueueShard;
 import com.example.dbqueue.config.TaskLifecycleListener;
@@ -12,12 +14,9 @@ import com.example.dbqueue.internal.processing.TaskResultHandler;
 import com.example.dbqueue.settings.ProcessingMode;
 import com.example.dbqueue.settings.QueueLocation;
 import com.example.dbqueue.settings.QueueSettings;
-
-import javax.annotation.Nonnull;
 import java.util.Optional;
 import java.util.concurrent.Executor;
-
-import static java.util.Objects.requireNonNull;
+import javax.annotation.Nonnull;
 
 /**
  * Интерфейс обработчика пула задач очереди
@@ -39,8 +38,7 @@ public interface QueueRunner {
      */
     final class Factory {
 
-        private Factory() {
-        }
+        private Factory() {}
 
         /**
          * Создать исполнителя задач очереди
@@ -50,9 +48,10 @@ public interface QueueRunner {
          * @param taskLifecycleListener слушатель процесса обработки задач
          * @return инстанс исполнителя задач
          */
-        public static QueueRunner create(@Nonnull QueueConsumer queueConsumer,
-                                         @Nonnull QueueShard<?> queueShard,
-                                         @Nonnull TaskLifecycleListener taskLifecycleListener) {
+        public static QueueRunner create(
+                @Nonnull QueueConsumer queueConsumer,
+                @Nonnull QueueShard<?> queueShard,
+                @Nonnull TaskLifecycleListener taskLifecycleListener) {
             requireNonNull(queueConsumer);
             requireNonNull(queueShard);
             requireNonNull(taskLifecycleListener);
@@ -60,33 +59,43 @@ public interface QueueRunner {
             QueueSettings queueSettings = queueConsumer.getQueueConfig().getSettings();
             QueueLocation queueLocation = queueConsumer.getQueueConfig().getLocation();
 
-            QueuePickTaskDao queuePickTaskDao = queueShard.getDatabaseAccessLayer().createQueuePickTaskDao(
+            QueuePickTaskDao queuePickTaskDao = queueShard
+                    .getDatabaseAccessLayer()
+                    .createQueuePickTaskDao(
+                            queueLocation, queueSettings.getFailureSettings(), queueSettings.getPollSettings());
+
+            TaskPicker taskPicker = new TaskPicker(
+                    queueShard,
                     queueLocation,
-                    queueSettings.getFailureSettings(),
-                    queueSettings.getPollSettings()
-            );
+                    taskLifecycleListener,
+                    new MillisTimeProvider.SystemMillisTimeProvider(),
+                    queuePickTaskDao);
 
-            TaskPicker taskPicker = new TaskPicker(queueShard, queueLocation, taskLifecycleListener,
-                    new MillisTimeProvider.SystemMillisTimeProvider(), queuePickTaskDao);
+            TaskResultHandler taskResultHandler =
+                    new TaskResultHandler(queueLocation, queueShard, queueSettings.getReenqueueSettings());
 
-            TaskResultHandler taskResultHandler = new TaskResultHandler(
-                    queueLocation,
-                    queueShard, queueSettings.getReenqueueSettings());
+            TaskProcessor taskProcessor = new TaskProcessor(
+                    queueShard,
+                    taskLifecycleListener,
+                    new MillisTimeProvider.SystemMillisTimeProvider(),
+                    taskResultHandler);
 
-            TaskProcessor taskProcessor = new TaskProcessor(queueShard, taskLifecycleListener,
-                    new MillisTimeProvider.SystemMillisTimeProvider(), taskResultHandler);
-
-            ProcessingMode processingMode = queueSettings.getProcessingSettings().getProcessingMode();
+            ProcessingMode processingMode =
+                    queueSettings.getProcessingSettings().getProcessingMode();
             return switch (processingMode) {
                 case SEPARATE_TRANSACTIONS -> new QueueRunnerInSeparateTransactions(taskPicker, taskProcessor);
                 case WRAP_IN_TRANSACTION -> new QueueRunnerInTransaction(taskPicker, taskProcessor, queueShard);
-                case USE_EXTERNAL_EXECUTOR -> new QueueRunnerInExternalExecutor(taskPicker, taskProcessor,
-                        ((Optional<Executor>) queueConsumer.getExecutor()).orElseThrow(() ->
-                                new IllegalArgumentException("Executor is empty. " +
-                                        "You must provide QueueConsumer#getExecutor in ProcessingMode#USE_EXTERNAL_EXECUTOR")));
+                case USE_EXTERNAL_EXECUTOR ->
+                    new QueueRunnerInExternalExecutor(
+                            taskPicker,
+                            taskProcessor,
+                            ((Optional<Executor>) queueConsumer.getExecutor())
+                                    .orElseThrow(
+                                            () -> new IllegalArgumentException(
+                                                    "Executor is empty. "
+                                                            + "You must provide QueueConsumer#getExecutor in ProcessingMode#USE_EXTERNAL_EXECUTOR")));
                 default -> throw new IllegalStateException("unknown processing mode: " + processingMode);
             };
         }
-
     }
 }

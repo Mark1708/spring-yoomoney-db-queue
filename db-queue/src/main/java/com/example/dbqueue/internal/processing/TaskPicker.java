@@ -1,15 +1,14 @@
 package com.example.dbqueue.internal.processing;
 
+import static java.util.Objects.requireNonNull;
+
 import com.example.dbqueue.api.TaskRecord;
-import com.example.dbqueue.dao.QueuePickTaskDao;
 import com.example.dbqueue.config.QueueShard;
 import com.example.dbqueue.config.TaskLifecycleListener;
+import com.example.dbqueue.dao.QueuePickTaskDao;
 import com.example.dbqueue.settings.QueueLocation;
-
-import javax.annotation.Nonnull;
 import java.util.List;
-
-import static java.util.Objects.requireNonNull;
+import javax.annotation.Nonnull;
 
 /**
  * Класс, обеспечивающий выборку задачи из очереди
@@ -18,10 +17,13 @@ public class TaskPicker {
 
     @Nonnull
     private final QueueShard<?> queueShard;
+
     @Nonnull
     private final QueueLocation queueLocation;
+
     @Nonnull
     private final TaskLifecycleListener taskLifecycleListener;
+
     @Nonnull
     private final MillisTimeProvider millisTimeProvider;
 
@@ -36,11 +38,12 @@ public class TaskPicker {
      * @param millisTimeProvider    current time provider
      * @param pickTaskDao           dao for picking up tasks
      */
-    public TaskPicker(@Nonnull QueueShard<?> queueShard,
-                      @Nonnull QueueLocation queueLocation,
-                      @Nonnull TaskLifecycleListener taskLifecycleListener,
-                      @Nonnull MillisTimeProvider millisTimeProvider,
-                      @Nonnull QueuePickTaskDao pickTaskDao) {
+    public TaskPicker(
+            @Nonnull QueueShard<?> queueShard,
+            @Nonnull QueueLocation queueLocation,
+            @Nonnull TaskLifecycleListener taskLifecycleListener,
+            @Nonnull MillisTimeProvider millisTimeProvider,
+            @Nonnull QueuePickTaskDao pickTaskDao) {
         this.queueShard = requireNonNull(queueShard);
         this.queueLocation = requireNonNull(queueLocation);
         this.taskLifecycleListener = requireNonNull(taskLifecycleListener);

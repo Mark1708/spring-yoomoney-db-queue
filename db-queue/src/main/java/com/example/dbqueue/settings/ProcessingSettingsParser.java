@@ -1,17 +1,17 @@
 package com.example.dbqueue.settings;
 
-import javax.annotation.Nonnull;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
-import java.util.Optional;
-import java.util.function.Supplier;
-
 import static com.example.dbqueue.settings.QueueConfigsReader.SETTING_PROCESSING_MODE;
 import static com.example.dbqueue.settings.QueueConfigsReader.SETTING_THREAD_COUNT;
 import static com.example.dbqueue.settings.QueueConfigsReader.VALUE_PROCESSING_MODE_SEPARATE_TRANSACTIONS;
 import static com.example.dbqueue.settings.QueueConfigsReader.VALUE_PROCESSING_MODE_USE_EXTERNAL_EXECUTOR;
 import static com.example.dbqueue.settings.QueueConfigsReader.VALUE_PROCESSING_MODE_WRAP_IN_TRANSACTION;
+
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+import java.util.Optional;
+import java.util.function.Supplier;
+import javax.annotation.Nonnull;
 
 /**
  * Parser for {@link ProcessingSettings}
@@ -27,8 +27,8 @@ public class ProcessingSettingsParser {
      * @param defaultSettings default settings
      * @param errorMessages   list of error messages
      */
-    ProcessingSettingsParser(@Nonnull Supplier<ProcessingSettings.Builder> defaultSettings,
-                             @Nonnull List<String> errorMessages) {
+    ProcessingSettingsParser(
+            @Nonnull Supplier<ProcessingSettings.Builder> defaultSettings, @Nonnull List<String> errorMessages) {
         this.defaultSettings = Objects.requireNonNull(defaultSettings, "defaultSettings");
         this.errorMessages = Objects.requireNonNull(errorMessages, "errorMessages");
     }
@@ -48,7 +48,8 @@ public class ProcessingSettingsParser {
             settings.forEach((key, value) -> fillSettings(processingSettings, key, value));
             return Optional.of(processingSettings.build());
         } catch (RuntimeException exc) {
-            errorMessages.add(String.format("cannot build processing settings: queueId=%s, msg=%s", queueId, exc.getMessage()));
+            errorMessages.add(
+                    String.format("cannot build processing settings: queueId=%s, msg=%s", queueId, exc.getMessage()));
             return Optional.empty();
         }
     }
@@ -58,12 +59,12 @@ public class ProcessingSettingsParser {
             switch (name) {
                 case SETTING_THREAD_COUNT -> processingSettings.withThreadCount(Integer.valueOf(value));
                 case SETTING_PROCESSING_MODE -> processingSettings.withProcessingMode(parseProcessingMode(value));
-                default -> {
-                }
+                default -> {}
             }
         } catch (RuntimeException exc) {
-            errorMessages.add(String.format("cannot parse setting: name=%s, value=%s, exception=%s", name, value,
-                    exc.getClass().getSimpleName() + '(' + exc.getMessage() + ')'));
+            errorMessages.add(String.format(
+                    "cannot parse setting: name=%s, value=%s, exception=%s",
+                    name, value, exc.getClass().getSimpleName() + '(' + exc.getMessage() + ')'));
         }
     }
 
@@ -75,6 +76,4 @@ public class ProcessingSettingsParser {
             default -> throw new IllegalArgumentException(String.format("unknown processing mode: name=%s", name));
         };
     }
-
-
 }

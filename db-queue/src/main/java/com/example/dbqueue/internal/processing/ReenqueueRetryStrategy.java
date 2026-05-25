@@ -2,12 +2,11 @@ package com.example.dbqueue.internal.processing;
 
 import com.example.dbqueue.api.TaskRecord;
 import com.example.dbqueue.settings.ReenqueueSettings;
-
-import javax.annotation.Nonnull;
 import java.time.Duration;
 import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
+import javax.annotation.Nonnull;
 
 /**
  * Стратегия по вычислению задержки перед следующим выполнением задачи в случае, если задачу требуется вернуть в очередь.
@@ -28,8 +27,7 @@ public interface ReenqueueRetryStrategy {
      */
     final class Factory {
 
-        private Factory() {
-        }
+        private Factory() {}
 
         /**
          * Создает стратегию на основе переданных настроек переоткладывания задач для очереди.
@@ -45,20 +43,18 @@ public interface ReenqueueRetryStrategy {
                 case MANUAL -> new ManualReenqueueRetryStrategy();
                 case FIXED -> new FixedDelayReenqueueRetryStrategy(reenqueueSettings.getFixedDelayOrThrow());
                 case SEQUENTIAL -> new SequentialReenqueueRetryStrategy(reenqueueSettings.getSequentialPlanOrThrow());
-                case ARITHMETIC -> new ArithmeticReenqueueRetryStrategy(
-                        reenqueueSettings.getInitialDelayOrThrow(),
-                        reenqueueSettings.getArithmeticStepOrThrow()
-                );
-                case GEOMETRIC -> new GeometricReenqueueRetryStrategy(
-                        reenqueueSettings.getInitialDelayOrThrow(),
-                        reenqueueSettings.getGeometricRatioOrThrow()
-                );
+                case ARITHMETIC ->
+                    new ArithmeticReenqueueRetryStrategy(
+                            reenqueueSettings.getInitialDelayOrThrow(), reenqueueSettings.getArithmeticStepOrThrow());
+                case GEOMETRIC ->
+                    new GeometricReenqueueRetryStrategy(
+                            reenqueueSettings.getInitialDelayOrThrow(), reenqueueSettings.getGeometricRatioOrThrow());
                 default ->
-                        throw new IllegalArgumentException("unknown re-enqueue retry type: type=" + reenqueueSettings.getRetryType());
+                    throw new IllegalArgumentException(
+                            "unknown re-enqueue retry type: type=" + reenqueueSettings.getRetryType());
             };
         }
     }
-
 
     /**
      * Стратегия, которая не вычисляет задержку. Используется в случае, если продолжительность задержки выбирается
@@ -70,8 +66,7 @@ public interface ReenqueueRetryStrategy {
         @Override
         public Duration calculateDelay(@Nonnull TaskRecord taskRecord) {
             throw new UnsupportedOperationException(
-                    "re-enqueue delay must be set explicitly via 'reenqueue(Duration)' method call"
-            );
+                    "re-enqueue delay must be set explicitly via 'reenqueue(Duration)' method call");
         }
     }
 
@@ -126,6 +121,7 @@ public interface ReenqueueRetryStrategy {
 
         @Nonnull
         private final Duration initialDelay;
+
         @Nonnull
         private final Duration step;
 
@@ -149,6 +145,7 @@ public interface ReenqueueRetryStrategy {
 
         @Nonnull
         private final Duration initialDelay;
+
         private final long ratio;
 
         GeometricReenqueueRetryStrategy(@Nonnull Duration initialDelay, long ratio) {

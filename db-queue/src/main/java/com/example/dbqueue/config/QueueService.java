@@ -1,5 +1,7 @@
 package com.example.dbqueue.config;
 
+import static java.util.Objects.requireNonNull;
+
 import com.example.dbqueue.api.QueueConsumer;
 import com.example.dbqueue.internal.processing.MillisTimeProvider;
 import com.example.dbqueue.internal.processing.TimeLimiter;
@@ -11,11 +13,6 @@ import com.example.dbqueue.settings.QueueConfigsReader;
 import com.example.dbqueue.settings.QueueId;
 import com.example.dbqueue.settings.QueueSettings;
 import com.example.dbqueue.settings.ReenqueueSettings;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import javax.annotation.Nonnull;
-import javax.annotation.concurrent.ThreadSafe;
 import java.time.Duration;
 import java.util.Collection;
 import java.util.LinkedHashMap;
@@ -26,8 +23,10 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.TimeUnit;
 import java.util.function.BiFunction;
 import java.util.stream.Collectors;
-
-import static java.util.Objects.requireNonNull;
+import javax.annotation.Nonnull;
+import javax.annotation.concurrent.ThreadSafe;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * A service for managing start, pause and shutdown of task processors.
@@ -38,35 +37,39 @@ public class QueueService {
 
     @Nonnull
     private final Map<QueueId, Map<QueueShardId, QueueExecutionPool>> registeredQueues = new LinkedHashMap<>();
+
     @Nonnull
     private final Map<QueueId, QueueConsumer<?>> registeredConsumer = new LinkedHashMap<>();
+
     @Nonnull
     private final List<QueueShard<?>> queueShards;
+
     @Nonnull
     private final BiFunction<QueueShard<?>, QueueConsumer<?>, QueueExecutionPool> queueExecutionPoolFactory;
 
-    public QueueService(@Nonnull List<QueueShard<?>> queueShards,
-                        @Nonnull ThreadLifecycleListener threadLifecycleListener,
-                        @Nonnull TaskLifecycleListener taskLifecycleListener) {
-        this(queueShards,
-                (shard, consumer) -> new QueueExecutionPool(consumer, shard,
-                        taskLifecycleListener, threadLifecycleListener));
+    public QueueService(
+            @Nonnull List<QueueShard<?>> queueShards,
+            @Nonnull ThreadLifecycleListener threadLifecycleListener,
+            @Nonnull TaskLifecycleListener taskLifecycleListener) {
+        this(
+                queueShards,
+                (shard, consumer) ->
+                        new QueueExecutionPool(consumer, shard, taskLifecycleListener, threadLifecycleListener));
     }
 
-    QueueService(@Nonnull List<QueueShard<?>> queueShards,
-                 @Nonnull BiFunction<QueueShard<?>,
-                         QueueConsumer<?>, QueueExecutionPool> queueExecutionPoolFactory) {
+    QueueService(
+            @Nonnull List<QueueShard<?>> queueShards,
+            @Nonnull BiFunction<QueueShard<?>, QueueConsumer<?>, QueueExecutionPool> queueExecutionPoolFactory) {
         this.queueShards = requireNonNull(queueShards, "queueShards");
         this.queueExecutionPoolFactory = requireNonNull(queueExecutionPoolFactory, "queueExecutionPoolFactory");
     }
 
-    private Map<QueueShardId, QueueExecutionPool> getQueuePools(@Nonnull QueueId queueId,
-                                                                @Nonnull String method) {
+    private Map<QueueShardId, QueueExecutionPool> getQueuePools(@Nonnull QueueId queueId, @Nonnull String method) {
         requireNonNull(queueId, "queueId");
         requireNonNull(method, "method");
         if (!registeredQueues.containsKey(queueId)) {
-            throw new IllegalArgumentException("cannot invoke " + method +
-                    ", queue is not registered: queueId=" + queueId);
+            throw new IllegalArgumentException(
+                    "cannot invoke " + method + ", queue is not registered: queueId=" + queueId);
         }
         return registeredQueues.get(queueId);
     }
@@ -86,8 +89,8 @@ public class QueueService {
             return false;
         }
         Map<QueueShardId, QueueExecutionPool> queueShardPools = new LinkedHashMap<>();
-        queueShards.forEach(shard -> queueShardPools.put(shard.getShardId(),
-                queueExecutionPoolFactory.apply(shard, consumer)));
+        queueShards.forEach(
+                shard -> queueShardPools.put(shard.getShardId(), queueExecutionPoolFactory.apply(shard, consumer)));
         registeredQueues.put(queueId, queueShardPools);
         registeredConsumer.put(queueId, consumer);
         return true;
@@ -110,25 +113,38 @@ public class QueueService {
         Map<QueueId, String> resultDiff = new LinkedHashMap<>();
         configs.forEach(newConfig -> {
             if (!registeredConsumer.containsKey(newConfig.getLocation().getQueueId())) {
-                throw new IllegalArgumentException("cannot update queue configuration" +
-                        ", queue is not registered: queueId=" + newConfig.getLocation().getQueueId());
+                throw new IllegalArgumentException(
+                        "cannot update queue configuration" + ", queue is not registered: queueId="
+                                + newConfig.getLocation().getQueueId());
             }
 
             StringJoiner queueDiff = new StringJoiner(",");
-            QueueSettings actualSettings = registeredConsumer.get(newConfig.getLocation().getQueueId())
-                    .getQueueConfig().getSettings();
+            QueueSettings actualSettings = registeredConsumer
+                    .get(newConfig.getLocation().getQueueId())
+                    .getQueueConfig()
+                    .getSettings();
             QueueSettings newSettings = newConfig.getSettings();
 
-            actualSettings.getProcessingSettings().setValue(
-                    newSettings.getProcessingSettings()).ifPresent(queueDiff::add);
-            actualSettings.getPollSettings().setValue(
-                    newSettings.getPollSettings()).ifPresent(queueDiff::add);
-            actualSettings.getFailureSettings().setValue(
-                    newSettings.getFailureSettings()).ifPresent(queueDiff::add);
-            actualSettings.getReenqueueSettings().setValue(
-                    newSettings.getReenqueueSettings()).ifPresent(queueDiff::add);
-            actualSettings.getExtSettings().setValue(
-                    newSettings.getExtSettings()).ifPresent(queueDiff::add);
+            actualSettings
+                    .getProcessingSettings()
+                    .setValue(newSettings.getProcessingSettings())
+                    .ifPresent(queueDiff::add);
+            actualSettings
+                    .getPollSettings()
+                    .setValue(newSettings.getPollSettings())
+                    .ifPresent(queueDiff::add);
+            actualSettings
+                    .getFailureSettings()
+                    .setValue(newSettings.getFailureSettings())
+                    .ifPresent(queueDiff::add);
+            actualSettings
+                    .getReenqueueSettings()
+                    .setValue(newSettings.getReenqueueSettings())
+                    .ifPresent(queueDiff::add);
+            actualSettings
+                    .getExtSettings()
+                    .setValue(newSettings.getExtSettings())
+                    .ifPresent(queueDiff::add);
 
             if (!queueDiff.toString().isEmpty()) {
                 resultDiff.put(newConfig.getLocation().getQueueId(), queueDiff.toString());
@@ -187,8 +203,7 @@ public class QueueService {
      */
     public synchronized boolean isShutdown(@Nonnull QueueId queueId) {
         requireNonNull(queueId, "queueId");
-        return getQueuePools(queueId, "isShutdown").values().stream()
-                .allMatch(QueueExecutionPool::isShutdown);
+        return getQueuePools(queueId, "isShutdown").values().stream().allMatch(QueueExecutionPool::isShutdown);
     }
 
     /**
@@ -283,8 +298,7 @@ public class QueueService {
      */
     public synchronized boolean isPaused(@Nonnull QueueId queueId) {
         requireNonNull(queueId, "queueId");
-        return getQueuePools(queueId, "isPaused").values().stream()
-                .allMatch(QueueExecutionPool::isPaused);
+        return getQueuePools(queueId, "isPaused").values().stream().allMatch(QueueExecutionPool::isPaused);
     }
 
     /**
@@ -298,9 +312,13 @@ public class QueueService {
         requireNonNull(timeout, "timeout");
         log.info("awaiting all queues termination: timeout={}", timeout);
         TimeLimiter timeLimiter = new TimeLimiter(new MillisTimeProvider.SystemMillisTimeProvider(), timeout);
-        registeredQueues.keySet().forEach(queueId ->
-                timeLimiter.execute(remainingTimeout -> awaitTermination(queueId, remainingTimeout)));
-        return registeredQueues.keySet().stream().filter(queueId -> !isTerminated(queueId)).collect(Collectors.toList());
+        registeredQueues
+                .keySet()
+                .forEach(queueId ->
+                        timeLimiter.execute(remainingTimeout -> awaitTermination(queueId, remainingTimeout)));
+        return registeredQueues.keySet().stream()
+                .filter(queueId -> !isTerminated(queueId))
+                .collect(Collectors.toList());
     }
 
     /**
@@ -316,7 +334,8 @@ public class QueueService {
         requireNonNull(timeout, "timeout");
         log.info("awaiting queue termination: queueId={}, timeout={}", queueId, timeout);
         TimeLimiter timeLimiter = new TimeLimiter(new MillisTimeProvider.SystemMillisTimeProvider(), timeout);
-        getQueuePools(queueId, "awaitTermination").values()
+        getQueuePools(queueId, "awaitTermination")
+                .values()
                 .forEach(queueExecutionPool -> timeLimiter.execute(queueExecutionPool::awaitTermination));
         return getQueuePools(queueId, "awaitTermination").values().stream()
                 .filter(queueExecutionPool -> !queueExecutionPool.isTerminated())
@@ -345,10 +364,9 @@ public class QueueService {
         Map<QueueShardId, QueueExecutionPool> queuePools = getQueuePools(queueId, "wakeup");
         QueueExecutionPool queueExecutionPool = queuePools.get(queueShardId);
         if (queueExecutionPool == null) {
-            throw new IllegalArgumentException("cannot wakeup, unknown shard: " +
-                    "queueId=" + queueId + ", shardId=" + queueShardId);
+            throw new IllegalArgumentException(
+                    "cannot wakeup, unknown shard: " + "queueId=" + queueId + ", shardId=" + queueShardId);
         }
         queueExecutionPool.wakeup();
     }
-
 }

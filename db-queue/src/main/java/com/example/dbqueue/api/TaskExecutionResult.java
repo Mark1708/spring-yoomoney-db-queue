@@ -1,13 +1,11 @@
 package com.example.dbqueue.api;
 
-
 import com.example.dbqueue.settings.ReenqueueRetryType;
-
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
 import java.time.Duration;
 import java.util.Objects;
 import java.util.Optional;
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 
 /**
  * The action, which should be performed after the task processing.
@@ -38,6 +36,7 @@ public final class TaskExecutionResult {
 
     @Nonnull
     private final Type actionType;
+
     @Nullable
     private final Duration executionDelay;
 
@@ -141,8 +140,7 @@ public final class TaskExecutionResult {
             return false;
         }
         TaskExecutionResult that = (TaskExecutionResult) obj;
-        return actionType == that.actionType &&
-                Objects.equals(executionDelay, that.executionDelay);
+        return actionType == that.actionType && Objects.equals(executionDelay, that.executionDelay);
     }
 
     @Override
@@ -152,9 +150,8 @@ public final class TaskExecutionResult {
 
     @Override
     public String toString() {
-        return '{' +
-                "actionType=" + actionType +
-                (executionDelay == null ? "" : ", executionDelay=" + executionDelay) +
-                '}';
+        return '{' + "actionType="
+                + actionType + (executionDelay == null ? "" : ", executionDelay=" + executionDelay)
+                + '}';
     }
 }

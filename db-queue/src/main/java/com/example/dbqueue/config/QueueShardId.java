@@ -1,7 +1,7 @@
 package com.example.dbqueue.config;
 
-import javax.annotation.Nonnull;
 import java.util.Objects;
+import javax.annotation.Nonnull;
 
 /**
  * Storage for shard information.
@@ -51,5 +51,4 @@ public final class QueueShardId {
     public String toString() {
         return id;
     }
-
 }

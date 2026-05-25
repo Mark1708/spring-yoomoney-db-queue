@@ -1,12 +1,12 @@
 package com.example.dbqueue.settings;
 
-import javax.annotation.Nonnull;
+import static java.util.Objects.requireNonNull;
+
 import java.time.Duration;
 import java.util.Objects;
 import java.util.StringJoiner;
 import java.util.function.BiFunction;
-
-import static java.util.Objects.requireNonNull;
+import javax.annotation.Nonnull;
 
 /**
  * Settings for task execution strategy in case of failure.
@@ -14,11 +14,11 @@ import static java.util.Objects.requireNonNull;
 public class FailureSettings extends DynamicSetting<FailureSettings> {
     @Nonnull
     private FailRetryType retryType;
+
     @Nonnull
     private Duration retryInterval;
 
-    private FailureSettings(@Nonnull FailRetryType retryType,
-                            @Nonnull Duration retryInterval) {
+    private FailureSettings(@Nonnull FailRetryType retryType, @Nonnull Duration retryInterval) {
         this.retryType = requireNonNull(retryType, "retryType must not be null");
         this.retryInterval = requireNonNull(retryInterval, "retryInterval must not be null");
     }
@@ -72,10 +72,7 @@ public class FailureSettings extends DynamicSetting<FailureSettings> {
 
     @Override
     public String toString() {
-        return "{" +
-                "retryType=" + retryType +
-                ", retryInterval=" + retryInterval +
-                '}';
+        return "{" + "retryType=" + retryType + ", retryInterval=" + retryInterval + '}';
     }
 
     @Nonnull
@@ -90,12 +87,10 @@ public class FailureSettings extends DynamicSetting<FailureSettings> {
         return (oldVal, newVal) -> {
             StringJoiner diff = new StringJoiner(",", getName() + '(', ")");
             if (oldVal.retryType != newVal.retryType) {
-                diff.add("retryType=" +
-                        newVal.retryType + '<' + oldVal.retryType);
+                diff.add("retryType=" + newVal.retryType + '<' + oldVal.retryType);
             }
             if (!Objects.equals(oldVal.retryInterval, newVal.retryInterval)) {
-                diff.add("retryInterval=" +
-                        newVal.retryInterval + '<' + oldVal.retryInterval);
+                diff.add("retryInterval=" + newVal.retryInterval + '<' + oldVal.retryInterval);
             }
             return diff.toString();
         };

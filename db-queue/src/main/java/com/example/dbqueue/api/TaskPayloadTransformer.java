@@ -26,5 +26,4 @@ public interface TaskPayloadTransformer<PayloadT> {
      */
     @Nullable
     String fromObject(@Nullable PayloadT payload);
-
 }

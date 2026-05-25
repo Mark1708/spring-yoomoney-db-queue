@@ -1,9 +1,9 @@
 package com.example.dbqueue.settings;
 
-import javax.annotation.Nonnull;
 import java.util.Objects;
 import java.util.StringJoiner;
 import java.util.function.BiFunction;
+import javax.annotation.Nonnull;
 
 /**
  * Task processing settings.
@@ -11,11 +11,11 @@ import java.util.function.BiFunction;
 public class ProcessingSettings extends DynamicSetting<ProcessingSettings> {
     @Nonnull
     private Integer threadCount;
+
     @Nonnull
     private ProcessingMode processingMode;
 
-    private ProcessingSettings(@Nonnull Integer threadCount,
-                               @Nonnull ProcessingMode processingMode) {
+    private ProcessingSettings(@Nonnull Integer threadCount, @Nonnull ProcessingMode processingMode) {
         this.threadCount = Objects.requireNonNull(threadCount, "threadCount must not be null");
         this.processingMode = Objects.requireNonNull(processingMode, "processingMode must not be null");
         if (threadCount < 0) {
@@ -64,12 +64,10 @@ public class ProcessingSettings extends DynamicSetting<ProcessingSettings> {
         return (oldVal, newVal) -> {
             StringJoiner diff = new StringJoiner(",", getName() + '(', ")");
             if (!Objects.equals(oldVal.threadCount, newVal.threadCount)) {
-                diff.add("threadCount=" +
-                        newVal.threadCount + '<' + oldVal.threadCount);
+                diff.add("threadCount=" + newVal.threadCount + '<' + oldVal.threadCount);
             }
             if (oldVal.processingMode != newVal.processingMode) {
-                diff.add("processingMode=" +
-                        newVal.processingMode + '<' + oldVal.processingMode);
+                diff.add("processingMode=" + newVal.processingMode + '<' + oldVal.processingMode);
             }
             return diff.toString();
         };
@@ -106,10 +104,7 @@ public class ProcessingSettings extends DynamicSetting<ProcessingSettings> {
 
     @Override
     public String toString() {
-        return "{" +
-                "threadCount=" + threadCount +
-                ", processingMode=" + processingMode +
-                '}';
+        return "{" + "threadCount=" + threadCount + ", processingMode=" + processingMode + '}';
     }
 
     /**
@@ -119,8 +114,7 @@ public class ProcessingSettings extends DynamicSetting<ProcessingSettings> {
         private Integer threadCount;
         private ProcessingMode processingMode;
 
-        private Builder() {
-        }
+        private Builder() {}
 
         /**
          * Set number of threads for processing tasks in the queue.

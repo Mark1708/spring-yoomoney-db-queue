@@ -1,13 +1,13 @@
 package com.example.dbqueue.settings;
 
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
+import static java.util.Objects.requireNonNull;
+
 import java.time.Duration;
 import java.util.Objects;
 import java.util.StringJoiner;
 import java.util.function.BiFunction;
-
-import static java.util.Objects.requireNonNull;
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 
 /**
  * Task polling settings.
@@ -15,17 +15,21 @@ import static java.util.Objects.requireNonNull;
 public class PollSettings extends DynamicSetting<PollSettings> {
     @Nonnull
     private Duration betweenTaskTimeout;
+
     @Nonnull
     private Duration noTaskTimeout;
+
     @Nonnull
     private Duration fatalCrashTimeout;
+
     @Nonnull
     private Integer batchSize;
 
-    private PollSettings(@Nonnull Duration betweenTaskTimeout,
-                         @Nonnull Duration noTaskTimeout,
-                         @Nonnull Duration fatalCrashTimeout,
-                         @Nonnull Integer batchSize) {
+    private PollSettings(
+            @Nonnull Duration betweenTaskTimeout,
+            @Nonnull Duration noTaskTimeout,
+            @Nonnull Duration fatalCrashTimeout,
+            @Nonnull Integer batchSize) {
         this.betweenTaskTimeout = requireNonNull(betweenTaskTimeout, "betweenTaskTimeout must not be null");
         this.noTaskTimeout = requireNonNull(noTaskTimeout, "noTaskTimeout must not be null");
         this.fatalCrashTimeout = requireNonNull(fatalCrashTimeout, "fatalCrashTimeout must not be null");
@@ -93,7 +97,8 @@ public class PollSettings extends DynamicSetting<PollSettings> {
             return false;
         }
         PollSettings that = (PollSettings) obj;
-        return betweenTaskTimeout.equals(that.betweenTaskTimeout) && noTaskTimeout.equals(that.noTaskTimeout)
+        return betweenTaskTimeout.equals(that.betweenTaskTimeout)
+                && noTaskTimeout.equals(that.noTaskTimeout)
                 && fatalCrashTimeout.equals(that.fatalCrashTimeout)
                 && batchSize.equals(that.batchSize);
     }
@@ -105,12 +110,11 @@ public class PollSettings extends DynamicSetting<PollSettings> {
 
     @Override
     public String toString() {
-        return "{" +
-                "betweenTaskTimeout=" + betweenTaskTimeout +
-                ", noTaskTimeout=" + noTaskTimeout +
-                ", fatalCrashTimeout=" + fatalCrashTimeout +
-                ", batchSize=" + batchSize +
-                '}';
+        return "{" + "betweenTaskTimeout="
+                + betweenTaskTimeout + ", noTaskTimeout="
+                + noTaskTimeout + ", fatalCrashTimeout="
+                + fatalCrashTimeout + ", batchSize="
+                + batchSize + '}';
     }
 
     @Nonnull
@@ -125,20 +129,16 @@ public class PollSettings extends DynamicSetting<PollSettings> {
         return (oldVal, newVal) -> {
             StringJoiner diff = new StringJoiner(",", getName() + '(', ")");
             if (!Objects.equals(oldVal.betweenTaskTimeout, newVal.betweenTaskTimeout)) {
-                diff.add("betweenTaskTimeout=" +
-                        newVal.betweenTaskTimeout + '<' + oldVal.betweenTaskTimeout);
+                diff.add("betweenTaskTimeout=" + newVal.betweenTaskTimeout + '<' + oldVal.betweenTaskTimeout);
             }
             if (!Objects.equals(oldVal.noTaskTimeout, newVal.noTaskTimeout)) {
-                diff.add("noTaskTimeout=" +
-                        newVal.noTaskTimeout + '<' + oldVal.noTaskTimeout);
+                diff.add("noTaskTimeout=" + newVal.noTaskTimeout + '<' + oldVal.noTaskTimeout);
             }
             if (!Objects.equals(oldVal.fatalCrashTimeout, newVal.fatalCrashTimeout)) {
-                diff.add("fatalCrashTimeout=" +
-                        newVal.fatalCrashTimeout + '<' + oldVal.fatalCrashTimeout);
+                diff.add("fatalCrashTimeout=" + newVal.fatalCrashTimeout + '<' + oldVal.fatalCrashTimeout);
             }
             if (!Objects.equals(oldVal.batchSize, newVal.batchSize)) {
-                diff.add("batchSize=" +
-                        newVal.batchSize + '<' + oldVal.batchSize);
+                diff.add("batchSize=" + newVal.batchSize + '<' + oldVal.batchSize);
             }
             return diff.toString();
         };
@@ -169,8 +169,7 @@ public class PollSettings extends DynamicSetting<PollSettings> {
         private Integer batchSize;
         private Integer queryVersion = 0;
 
-        private Builder() {
-        }
+        private Builder() {}
 
         /**
          * Set delay duration between picking tasks from the queue
@@ -232,8 +231,7 @@ public class PollSettings extends DynamicSetting<PollSettings> {
          * @return A new poll settings object.
          */
         public PollSettings build() {
-            return new PollSettings(betweenTaskTimeout, noTaskTimeout, fatalCrashTimeout, batchSize
-                    );
+            return new PollSettings(betweenTaskTimeout, noTaskTimeout, fatalCrashTimeout, batchSize);
         }
     }
 }

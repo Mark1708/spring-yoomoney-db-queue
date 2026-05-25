@@ -1,13 +1,12 @@
 package com.example.dbqueue.config;
 
 import com.example.dbqueue.settings.QueueLocation;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import javax.annotation.Nonnull;
 import java.util.Objects;
 import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.atomic.AtomicLong;
+import javax.annotation.Nonnull;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Thread factory for tasks execution pool.
@@ -18,13 +17,13 @@ class QueueThreadFactory implements ThreadFactory {
 
     private static final String THREAD_FACTORY_NAME = "queue-";
     private static final AtomicLong threadNumber = new AtomicLong(0);
-    private final Thread.UncaughtExceptionHandler exceptionHandler =
-            new QueueUncaughtExceptionHandler();
+    private final Thread.UncaughtExceptionHandler exceptionHandler = new QueueUncaughtExceptionHandler();
+
     @Nonnull
     private final QueueLocation location;
+
     @Nonnull
     private final QueueShardId shardId;
-
 
     QueueThreadFactory(@Nonnull QueueLocation location, @Nonnull QueueShardId shardId) {
         this.location = Objects.requireNonNull(location);
@@ -34,8 +33,8 @@ class QueueThreadFactory implements ThreadFactory {
     @Override
     public Thread newThread(@Nonnull Runnable runnable) {
         String threadName = THREAD_FACTORY_NAME + threadNumber.getAndIncrement();
-        Thread thread = new QueueThread(Thread.currentThread().getThreadGroup(), runnable, threadName,
-                0, location, shardId);
+        Thread thread =
+                new QueueThread(Thread.currentThread().getThreadGroup(), runnable, threadName, 0, location, shardId);
         thread.setUncaughtExceptionHandler(exceptionHandler);
         return thread;
     }
@@ -44,11 +43,17 @@ class QueueThreadFactory implements ThreadFactory {
 
         @Nonnull
         private final QueueLocation location;
+
         @Nonnull
         private final QueueShardId shardId;
 
-        public QueueThread(ThreadGroup group, Runnable target, String name, long stackSize,
-                           @Nonnull QueueLocation location, @Nonnull QueueShardId shardId) {
+        public QueueThread(
+                ThreadGroup group,
+                Runnable target,
+                String name,
+                long stackSize,
+                @Nonnull QueueLocation location,
+                @Nonnull QueueShardId shardId) {
             super(group, target, name, stackSize);
             this.location = Objects.requireNonNull(location);
             this.shardId = Objects.requireNonNull(shardId);

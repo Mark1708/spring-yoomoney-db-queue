@@ -1,12 +1,10 @@
 package com.example.dbqueue.dao;
 
-import java.util.List;
-
 import com.example.dbqueue.api.EnqueueParams;
 import com.example.dbqueue.settings.QueueLocation;
-
-import javax.annotation.Nonnull;
 import java.time.Duration;
+import java.util.List;
+import javax.annotation.Nonnull;
 
 /**
  * Database access object to manage tasks in the queue.
@@ -20,7 +18,7 @@ public interface QueueDao {
      * @return Identifier (sequence id) of new inserted task.
      */
     long enqueue(@Nonnull QueueLocation location, @Nonnull EnqueueParams<String> enqueueParams);
-    
+
     /**
      * Add a new task in the queue for processing.
      *
@@ -48,5 +46,4 @@ public interface QueueDao {
      * @return true, if task was successfully postponed, false, when task was not found.
      */
     boolean reenqueue(@Nonnull QueueLocation location, long taskId, @Nonnull Duration executionDelay);
-
 }

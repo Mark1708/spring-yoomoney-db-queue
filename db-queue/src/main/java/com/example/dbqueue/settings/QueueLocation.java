@@ -1,10 +1,10 @@
 package com.example.dbqueue.settings;
 
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.regex.Pattern;
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 
 /**
  * Queue location in the database.
@@ -18,17 +18,20 @@ public final class QueueLocation {
 
     @Nonnull
     private final String tableName;
+
     @Nonnull
     private final QueueId queueId;
+
     @Nullable
     private final String idSequence;
 
-    private QueueLocation(@Nonnull QueueId queueId, @Nonnull String tableName,
-                          @Nullable String idSequence) {
+    private QueueLocation(@Nonnull QueueId queueId, @Nonnull String tableName, @Nullable String idSequence) {
         this.queueId = Objects.requireNonNull(queueId, "queueId must not be null");
-        this.tableName = DISALLOWED_CHARS.matcher(
-                Objects.requireNonNull(tableName, "tableName must not be null")).replaceAll("");
-        this.idSequence = idSequence != null ? DISALLOWED_CHARS.matcher(idSequence).replaceAll("") : null;
+        this.tableName = DISALLOWED_CHARS
+                .matcher(Objects.requireNonNull(tableName, "tableName must not be null"))
+                .replaceAll("");
+        this.idSequence =
+                idSequence != null ? DISALLOWED_CHARS.matcher(idSequence).replaceAll("") : null;
     }
 
     /**
@@ -64,11 +67,10 @@ public final class QueueLocation {
 
     @Override
     public String toString() {
-        return '{' +
-                "id=" + queueId +
-                ",table=" + tableName +
-                (idSequence != null ? ",idSequence=" + idSequence : "") +
-                '}';
+        return '{' + "id="
+                + queueId + ",table="
+                + tableName + (idSequence != null ? ",idSequence=" + idSequence : "")
+                + '}';
     }
 
     @Override
@@ -80,9 +82,9 @@ public final class QueueLocation {
             return false;
         }
         QueueLocation that = (QueueLocation) obj;
-        return Objects.equals(tableName, that.tableName) &&
-                Objects.equals(queueId, that.queueId) &&
-                Objects.equals(idSequence, that.idSequence);
+        return Objects.equals(tableName, that.tableName)
+                && Objects.equals(queueId, that.queueId)
+                && Objects.equals(idSequence, that.idSequence);
     }
 
     @Override
@@ -105,11 +107,11 @@ public final class QueueLocation {
     public static class Builder {
         private String tableName;
         private QueueId queueId;
+
         @Nullable
         private String idSequence;
 
-        private Builder() {
-        }
+        private Builder() {}
 
         /**
          * Set table name for queue tasks.

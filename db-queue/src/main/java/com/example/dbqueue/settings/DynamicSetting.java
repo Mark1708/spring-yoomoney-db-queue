@@ -1,15 +1,14 @@
 package com.example.dbqueue.settings;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import javax.annotation.Nonnull;
 import java.util.Collection;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.function.BiConsumer;
 import java.util.function.BiFunction;
+import javax.annotation.Nonnull;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Base class for dynamic settings.
@@ -77,8 +76,8 @@ abstract class DynamicSetting<T> {
             copyFields(newValue);
             return Optional.of(diff);
         } catch (RuntimeException exc) {
-            log.error("Cannot apply new setting: name={}, oldValue={}, newValue={}",
-                    getName(), oldValue, newValue, exc);
+            log.error(
+                    "Cannot apply new setting: name={}, oldValue={}, newValue={}", getName(), oldValue, newValue, exc);
             return Optional.empty();
         }
     }
@@ -92,5 +91,4 @@ abstract class DynamicSetting<T> {
     public final void registerObserver(BiConsumer<T, T> observer) {
         observers.add(observer);
     }
-
 }

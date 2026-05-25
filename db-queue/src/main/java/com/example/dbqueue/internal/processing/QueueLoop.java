@@ -1,9 +1,8 @@
 package com.example.dbqueue.internal.processing;
 
+import java.time.Duration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import java.time.Duration;
 
 /**
  * Вспомогательный класс, для задания стратегии
@@ -51,7 +50,6 @@ public interface QueueLoop {
     /**
      * Cтратегия выполнения задачи в потоке
      */
-
     class WakeupQueueLoop implements QueueLoop {
         private static final Logger log = LoggerFactory.getLogger(WakeupQueueLoop.class);
         private final MillisTimeProvider millisTimeProvider = new MillisTimeProvider.SystemMillisTimeProvider();
@@ -70,7 +68,9 @@ public interface QueueLoop {
                     }
                     runnable.run();
                 } catch (InterruptedException ignored) {
-                    log.info("sleep interrupted: threadName={}", Thread.currentThread().getName());
+                    log.info(
+                            "sleep interrupted: threadName={}",
+                            Thread.currentThread().getName());
                     Thread.currentThread().interrupt();
                 }
             }
@@ -105,7 +105,9 @@ public interface QueueLoop {
                     isWakedUp = false;
                 }
             } catch (InterruptedException ignored) {
-                log.info("sleep interrupted: threadName={}", Thread.currentThread().getName());
+                log.info(
+                        "sleep interrupted: threadName={}",
+                        Thread.currentThread().getName());
                 Thread.currentThread().interrupt();
             }
         }

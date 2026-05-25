@@ -1,8 +1,8 @@
 package com.example.dbqueue.config;
 
-import javax.annotation.Nonnull;
-
 import static java.util.Objects.requireNonNull;
+
+import javax.annotation.Nonnull;
 
 /**
  * Properties for connection to a database shard.
@@ -13,6 +13,7 @@ public class QueueShard<DatabaseAccessLayerT extends DatabaseAccessLayer> {
 
     @Nonnull
     private final QueueShardId shardId;
+
     @Nonnull
     private final DatabaseAccessLayerT databaseAccessLayer;
 
@@ -22,8 +23,7 @@ public class QueueShard<DatabaseAccessLayerT extends DatabaseAccessLayer> {
      * @param shardId             Shard identifier.
      * @param databaseAccessLayer database access layer.
      */
-    public QueueShard(@Nonnull QueueShardId shardId,
-                      @Nonnull DatabaseAccessLayerT databaseAccessLayer) {
+    public QueueShard(@Nonnull QueueShardId shardId, @Nonnull DatabaseAccessLayerT databaseAccessLayer) {
         this.shardId = requireNonNull(shardId);
         this.databaseAccessLayer = requireNonNull(databaseAccessLayer);
     }

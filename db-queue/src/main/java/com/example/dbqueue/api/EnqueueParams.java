@@ -1,14 +1,14 @@
 package com.example.dbqueue.api;
 
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
+import static java.util.Objects.requireNonNull;
+
 import java.time.Duration;
 import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Objects;
-
-import static java.util.Objects.requireNonNull;
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 
 /**
  * Parameters with typed payload to enqueue the task
@@ -18,8 +18,10 @@ import static java.util.Objects.requireNonNull;
 public final class EnqueueParams<PayloadT> {
     @Nullable
     private PayloadT payload;
+
     @Nonnull
     private Duration executionDelay = Duration.ZERO;
+
     @Nonnull
     private final Map<String, String> extData = new LinkedHashMap<>();
 
@@ -135,9 +137,9 @@ public final class EnqueueParams<PayloadT> {
             return false;
         }
         EnqueueParams<?> that = (EnqueueParams<?>) obj;
-        return Objects.equals(payload, that.payload) &&
-                Objects.equals(executionDelay, that.executionDelay) &&
-                Objects.equals(extData, that.extData);
+        return Objects.equals(payload, that.payload)
+                && Objects.equals(executionDelay, that.executionDelay)
+                && Objects.equals(extData, that.extData);
     }
 
     @Override
@@ -147,9 +149,6 @@ public final class EnqueueParams<PayloadT> {
 
     @Override
     public String toString() {
-        return '{' +
-                "executionDelay=" + executionDelay +
-                (payload != null ? ",payload=" + payload : "") +
-                '}';
+        return '{' + "executionDelay=" + executionDelay + (payload != null ? ",payload=" + payload : "") + '}';
     }
 }

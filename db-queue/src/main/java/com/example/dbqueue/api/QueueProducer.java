@@ -17,7 +17,7 @@ public interface QueueProducer<PayloadT> {
      * @return Enqueue result
      */
     EnqueueResult enqueue(@Nonnull EnqueueParams<PayloadT> enqueueParams);
-    
+
     /**
      * Add a new tasks into the queue in batch mode
      *
@@ -32,5 +32,4 @@ public interface QueueProducer<PayloadT> {
      */
     @Nonnull
     TaskPayloadTransformer<PayloadT> getPayloadTransformer();
-
 }

@@ -1,18 +1,17 @@
 package com.example.dbqueue.api.impl;
 
+import com.example.dbqueue.api.EnqueueParams;
+import com.example.dbqueue.api.EnqueueResult;
+import com.example.dbqueue.api.QueueProducer;
+import com.example.dbqueue.api.TaskPayloadTransformer;
+import com.example.dbqueue.internal.processing.MillisTimeProvider;
+import com.example.dbqueue.settings.QueueId;
 import java.util.List;
 import java.util.Objects;
 import java.util.function.BiConsumer;
 import javax.annotation.Nonnull;
-
-import com.example.dbqueue.api.EnqueueParams;
-import com.example.dbqueue.internal.processing.MillisTimeProvider;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import com.example.dbqueue.api.EnqueueResult;
-import com.example.dbqueue.api.QueueProducer;
-import com.example.dbqueue.api.TaskPayloadTransformer;
-import com.example.dbqueue.settings.QueueId;
 
 /**
  * Wrapper for queue producer with logging and monitoring support
@@ -25,10 +24,13 @@ public class MonitoringQueueProducer<PayloadT> implements QueueProducer<PayloadT
 
     @Nonnull
     private final QueueProducer<PayloadT> queueProducer;
+
     @Nonnull
     private final QueueId queueId;
+
     @Nonnull
     private final BiConsumer<EnqueueResult, Long> monitoringCallback;
+
     @Nonnull
     private final MillisTimeProvider millisTimeProvider;
 
@@ -41,10 +43,11 @@ public class MonitoringQueueProducer<PayloadT> implements QueueProducer<PayloadT
      *                           It might help to monitor enqueue time.
      * @param millisTimeProvider A millis provider to mock current time
      */
-    MonitoringQueueProducer(@Nonnull QueueProducer<PayloadT> queueProducer,
-                            @Nonnull QueueId queueId,
-                            @Nonnull BiConsumer<EnqueueResult, Long> monitoringCallback,
-                            @Nonnull MillisTimeProvider millisTimeProvider) {
+    MonitoringQueueProducer(
+            @Nonnull QueueProducer<PayloadT> queueProducer,
+            @Nonnull QueueId queueId,
+            @Nonnull BiConsumer<EnqueueResult, Long> monitoringCallback,
+            @Nonnull MillisTimeProvider millisTimeProvider) {
         this.queueProducer = Objects.requireNonNull(queueProducer);
         this.queueId = Objects.requireNonNull(queueId);
         this.monitoringCallback = Objects.requireNonNull(monitoringCallback);
@@ -59,9 +62,10 @@ public class MonitoringQueueProducer<PayloadT> implements QueueProducer<PayloadT
      * @param monitoringCallback Callback invoked after putting a task in the queue.
      *                           It might help to monitor enqueue time.
      */
-    public MonitoringQueueProducer(@Nonnull QueueProducer<PayloadT> queueProducer,
-                                   @Nonnull QueueId queueId,
-                                   @Nonnull BiConsumer<EnqueueResult, Long> monitoringCallback) {
+    public MonitoringQueueProducer(
+            @Nonnull QueueProducer<PayloadT> queueProducer,
+            @Nonnull QueueId queueId,
+            @Nonnull BiConsumer<EnqueueResult, Long> monitoringCallback) {
         this(queueProducer, queueId, monitoringCallback, new MillisTimeProvider.SystemMillisTimeProvider());
     }
 
@@ -71,10 +75,8 @@ public class MonitoringQueueProducer<PayloadT> implements QueueProducer<PayloadT
      * @param queueProducer Task producer for the queue
      * @param queueId       Id of the queue
      */
-    public MonitoringQueueProducer(@Nonnull QueueProducer<PayloadT> queueProducer,
-                                   @Nonnull QueueId queueId) {
-        this(queueProducer, queueId, (enqueueResult, id) -> {
-        });
+    public MonitoringQueueProducer(@Nonnull QueueProducer<PayloadT> queueProducer, @Nonnull QueueId queueId) {
+        this(queueProducer, queueId, (enqueueResult, id) -> {});
     }
 
     @Override

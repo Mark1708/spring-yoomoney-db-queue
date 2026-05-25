@@ -1,9 +1,9 @@
 package com.example.dbqueue.internal.processing;
 
-import javax.annotation.Nonnull;
 import java.time.Duration;
 import java.util.Objects;
 import java.util.function.Consumer;
+import javax.annotation.Nonnull;
 
 /**
  * Класс, для ограничения времени нескольких действий в заданный таймаут
@@ -11,11 +11,11 @@ import java.util.function.Consumer;
 public class TimeLimiter {
     @Nonnull
     private final MillisTimeProvider millisTimeProvider;
+
     private Duration remainingTimeout;
     private Duration elapsedTime = Duration.ZERO;
 
-    public TimeLimiter(@Nonnull MillisTimeProvider millisTimeProvider,
-                       @Nonnull Duration timeout) {
+    public TimeLimiter(@Nonnull MillisTimeProvider millisTimeProvider, @Nonnull Duration timeout) {
         this.millisTimeProvider = Objects.requireNonNull(millisTimeProvider);
         this.remainingTimeout = Objects.requireNonNull(timeout);
     }

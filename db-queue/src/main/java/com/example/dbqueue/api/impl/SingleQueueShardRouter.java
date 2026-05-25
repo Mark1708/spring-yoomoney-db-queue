@@ -4,9 +4,8 @@ import com.example.dbqueue.api.EnqueueParams;
 import com.example.dbqueue.api.QueueShardRouter;
 import com.example.dbqueue.config.DatabaseAccessLayer;
 import com.example.dbqueue.config.QueueShard;
-
-import javax.annotation.Nonnull;
 import java.util.Objects;
+import javax.annotation.Nonnull;
 
 /**
  * Shard router without sharding. Might be helpful if you have single database instance.

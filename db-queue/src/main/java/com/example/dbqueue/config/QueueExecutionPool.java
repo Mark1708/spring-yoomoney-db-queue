@@ -1,5 +1,7 @@
 package com.example.dbqueue.config;
 
+import static java.util.Objects.requireNonNull;
+
 import com.example.dbqueue.api.QueueConsumer;
 import com.example.dbqueue.internal.processing.MillisTimeProvider;
 import com.example.dbqueue.internal.processing.QueueLoop;
@@ -7,10 +9,6 @@ import com.example.dbqueue.internal.processing.QueueTaskPoller;
 import com.example.dbqueue.internal.runner.QueueRunner;
 import com.example.dbqueue.settings.QueueConfigsReader;
 import com.example.dbqueue.settings.QueueId;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import javax.annotation.Nonnull;
 import java.time.Duration;
 import java.util.ArrayList;
 import java.util.List;
@@ -20,8 +18,9 @@ import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Supplier;
-
-import static java.util.Objects.requireNonNull;
+import javax.annotation.Nonnull;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Task execution pool: manages start, pause and shutdown of task executors on the assigned shard.
@@ -31,53 +30,69 @@ class QueueExecutionPool {
 
     @Nonnull
     private final QueueConsumer<?> queueConsumer;
+
     @Nonnull
     private final QueueShard<?> queueShard;
+
     @Nonnull
     private final QueueTaskPoller queueTaskPoller;
+
     @Nonnull
     private final ExecutorService executor;
+
     @Nonnull
     private final QueueRunner queueRunner;
+
     @Nonnull
     private final Supplier<QueueLoop> queueLoopFactory;
+
     @Nonnull
     private final List<QueueWorker> queueWorkers = new ArrayList<>();
 
     private boolean started;
 
-    QueueExecutionPool(@Nonnull QueueConsumer<?> queueConsumer,
-                       @Nonnull QueueShard<?> queueShard,
-                       @Nonnull TaskLifecycleListener taskLifecycleListener,
-                       @Nonnull ThreadLifecycleListener threadLifecycleListener) {
-        this(queueConsumer, queueShard,
-                new QueueTaskPoller(threadLifecycleListener,
-                        new MillisTimeProvider.SystemMillisTimeProvider()),
+    QueueExecutionPool(
+            @Nonnull QueueConsumer<?> queueConsumer,
+            @Nonnull QueueShard<?> queueShard,
+            @Nonnull TaskLifecycleListener taskLifecycleListener,
+            @Nonnull ThreadLifecycleListener threadLifecycleListener) {
+        this(
+                queueConsumer,
+                queueShard,
+                new QueueTaskPoller(threadLifecycleListener, new MillisTimeProvider.SystemMillisTimeProvider()),
                 new ThreadPoolExecutor(
-                        queueConsumer.getQueueConfig().getSettings().getProcessingSettings().getThreadCount(),
+                        queueConsumer
+                                .getQueueConfig()
+                                .getSettings()
+                                .getProcessingSettings()
+                                .getThreadCount(),
                         Integer.MAX_VALUE,
-                        1L, TimeUnit.MILLISECONDS,
+                        1L,
+                        TimeUnit.MILLISECONDS,
                         new LinkedBlockingQueue<>(),
-                        new QueueThreadFactory(
-                                queueConsumer.getQueueConfig().getLocation(), queueShard.getShardId())),
+                        new QueueThreadFactory(queueConsumer.getQueueConfig().getLocation(), queueShard.getShardId())),
                 QueueRunner.Factory.create(queueConsumer, queueShard, taskLifecycleListener),
                 QueueLoop.WakeupQueueLoop::new);
     }
 
-    QueueExecutionPool(@Nonnull QueueConsumer<?> queueConsumer,
-                       @Nonnull QueueShard<?> queueShard,
-                       @Nonnull QueueTaskPoller queueTaskPoller,
-                       @Nonnull ExecutorService executor,
-                       @Nonnull QueueRunner queueRunner,
-                       @Nonnull Supplier<QueueLoop> queueLoopFactory) {
+    QueueExecutionPool(
+            @Nonnull QueueConsumer<?> queueConsumer,
+            @Nonnull QueueShard<?> queueShard,
+            @Nonnull QueueTaskPoller queueTaskPoller,
+            @Nonnull ExecutorService executor,
+            @Nonnull QueueRunner queueRunner,
+            @Nonnull Supplier<QueueLoop> queueLoopFactory) {
         this.queueConsumer = requireNonNull(queueConsumer);
         this.queueShard = requireNonNull(queueShard);
         this.queueTaskPoller = requireNonNull(queueTaskPoller);
         this.executor = requireNonNull(executor);
         this.queueRunner = requireNonNull(queueRunner);
         this.queueLoopFactory = requireNonNull(queueLoopFactory);
-        queueConsumer.getQueueConfig().getSettings().getProcessingSettings().registerObserver(
-                (oldValue, newValue) -> resizePool(newValue.getThreadCount()));
+        queueConsumer
+                .getQueueConfig()
+                .getSettings()
+                .getProcessingSettings()
+                .registerObserver((oldValue, newValue) -> resizePool(newValue.getThreadCount()));
     }
 
     private QueueId getQueueId() {
@@ -98,8 +113,15 @@ class QueueExecutionPool {
      */
     void start() {
         if (!started && !isShutdown()) {
-            int threadCount = queueConsumer.getQueueConfig().getSettings().getProcessingSettings().getThreadCount();
-            log.info("starting queue: queueId={}, shardId={}, threadCount={}", getQueueId(), queueShard.getShardId(),
+            int threadCount = queueConsumer
+                    .getQueueConfig()
+                    .getSettings()
+                    .getProcessingSettings()
+                    .getThreadCount();
+            log.info(
+                    "starting queue: queueId={}, shardId={}, threadCount={}",
+                    getQueueId(),
+                    queueShard.getShardId(),
                     threadCount);
             for (int i = 0; i < threadCount; i++) {
                 startThread(true);
@@ -121,10 +143,12 @@ class QueueExecutionPool {
         if (newThreadCount == oldThreadCount) {
             return;
         }
-        log.info("resizing queue execution pool: queueId={}, shardId={}, oldThreadCount={}, " +
-                        "newThreadCount={}",
+        log.info(
+                "resizing queue execution pool: queueId={}, shardId={}, oldThreadCount={}, " + "newThreadCount={}",
                 queueConsumer.getQueueConfig().getLocation().getQueueId(),
-                queueShard.getShardId(), oldThreadCount, newThreadCount);
+                queueShard.getShardId(),
+                oldThreadCount,
+                newThreadCount);
         if (newThreadCount > oldThreadCount) {
             for (int i = oldThreadCount; i < newThreadCount; i++) {
                 startThread(!isPaused());
@@ -147,8 +171,8 @@ class QueueExecutionPool {
 
     private void startThread(boolean startProcessing) {
         QueueLoop queueLoop = queueLoopFactory.get();
-        Future<?> future = executor.submit(() -> queueTaskPoller.start(queueLoop, queueShard.getShardId(),
-                queueConsumer, queueRunner));
+        Future<?> future = executor.submit(
+                () -> queueTaskPoller.start(queueLoop, queueShard.getShardId(), queueConsumer, queueRunner));
         if (startProcessing) {
             queueLoop.unpause();
         }
@@ -199,7 +223,8 @@ class QueueExecutionPool {
      * @return true if the tasks processing was paused.
      */
     boolean isPaused() {
-        return queueWorkers.stream().allMatch(queueWorker -> queueWorker.getLoop().isPaused());
+        return queueWorkers.stream()
+                .allMatch(queueWorker -> queueWorker.getLoop().isPaused());
     }
 
     /**
@@ -231,8 +256,11 @@ class QueueExecutionPool {
      */
     boolean awaitTermination(@Nonnull Duration timeout) {
         requireNonNull(timeout, "timeout");
-        log.info("awaiting queue termination: queueId={}, shardId={}, timeout={}",
-                getQueueId(), queueShard.getShardId(), timeout);
+        log.info(
+                "awaiting queue termination: queueId={}, shardId={}, timeout={}",
+                getQueueId(),
+                queueShard.getShardId(),
+                timeout);
         try {
             return executor.awaitTermination(timeout.getSeconds(), TimeUnit.SECONDS);
         } catch (InterruptedException e) {
@@ -252,6 +280,7 @@ class QueueExecutionPool {
     private static class QueueWorker {
         @Nonnull
         private final Future<?> future;
+
         @Nonnull
         private final QueueLoop loop;
 
@@ -270,5 +299,4 @@ class QueueExecutionPool {
             return loop;
         }
     }
-
 }

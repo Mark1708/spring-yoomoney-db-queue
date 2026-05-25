@@ -3,13 +3,12 @@ package com.example.dbqueue.config.impl;
 import com.example.dbqueue.config.QueueShardId;
 import com.example.dbqueue.config.ThreadLifecycleListener;
 import com.example.dbqueue.settings.QueueLocation;
-
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 
 /**
  * Composite listener. It allows combining several listeners into one.
@@ -21,6 +20,7 @@ public class CompositeThreadLifecycleListener implements ThreadLifecycleListener
 
     @Nonnull
     private final List<ThreadLifecycleListener> listeners;
+
     @Nonnull
     private final List<ThreadLifecycleListener> reverseListeners;
 
@@ -64,5 +64,4 @@ public class CompositeThreadLifecycleListener implements ThreadLifecycleListener
     public void processed(@Nonnull QueueShardId shardId, @Nonnull QueueLocation location) {
         reverseListeners.forEach(l -> l.processed(shardId, location));
     }
-    
 }

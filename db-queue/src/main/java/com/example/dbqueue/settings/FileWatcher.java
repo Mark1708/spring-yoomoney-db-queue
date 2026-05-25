@@ -1,10 +1,5 @@
 package com.example.dbqueue.settings;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import javax.annotation.Nonnull;
-import javax.annotation.concurrent.ThreadSafe;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.ClosedWatchServiceException;
@@ -17,6 +12,10 @@ import java.util.List;
 import java.util.Objects;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import javax.annotation.Nonnull;
+import javax.annotation.concurrent.ThreadSafe;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Provides tracking changes in a target file
@@ -28,10 +27,13 @@ class FileWatcher {
 
     @Nonnull
     private final ExecutorService executor;
+
     @Nonnull
     private final Path watchedFile;
+
     @Nonnull
     private final Path watchedDir;
+
     @Nonnull
     private final Runnable onChangeCallback;
 
@@ -43,15 +45,15 @@ class FileWatcher {
      * @param watchedFile      file to watch
      * @param onChangeCallback callback invoked on file change
      */
-    FileWatcher(@Nonnull Path watchedFile,
-                @Nonnull Runnable onChangeCallback) {
+    FileWatcher(@Nonnull Path watchedFile, @Nonnull Runnable onChangeCallback) {
         this.onChangeCallback = Objects.requireNonNull(onChangeCallback, "onChangeCallback must not be null");
         this.executor = Executors.newSingleThreadExecutor();
         this.watchedFile = Objects.requireNonNull(watchedFile, "watchedFile must not be null");
-        this.watchedDir = watchedFile.getParent();
-        if (watchedDir == null) {
+        Path dir = watchedFile.getParent();
+        if (dir == null) {
             throw new IllegalArgumentException("directory of watched file is empty");
         }
+        this.watchedDir = dir;
         if (!watchedFile.toFile().isFile()) {
             throw new IllegalArgumentException("watched file is not a file: file=" + watchedFile);
         }
@@ -92,8 +94,7 @@ class FileWatcher {
                 watchServiceFileDir,
                 StandardWatchEventKinds.ENTRY_CREATE,
                 StandardWatchEventKinds.ENTRY_DELETE,
-                StandardWatchEventKinds.ENTRY_MODIFY
-        );
+                StandardWatchEventKinds.ENTRY_MODIFY);
         executor.execute(() -> doWatch(watchServiceFileDir, watchedFile.toFile(), onChangeCallback));
     }
 
@@ -102,8 +103,7 @@ class FileWatcher {
             WatchKey watchKey;
             while ((watchKey = watchService.take()) != null) {
                 List<WatchEvent<?>> polledEvents = watchKey.pollEvents();
-                boolean fileModified = polledEvents
-                        .stream()
+                boolean fileModified = polledEvents.stream()
                         .filter(watchEvent -> !Objects.equals(watchEvent.kind(), StandardWatchEventKinds.OVERFLOW))
                         .map(watchEvent -> watchEvent.context().toString())
                         .anyMatch(fileName -> fileName.equals(file.getName()));

@@ -3,7 +3,6 @@ package com.example.dbqueue.config;
 import com.example.dbqueue.api.TaskExecutionResult;
 import com.example.dbqueue.api.TaskRecord;
 import com.example.dbqueue.settings.QueueLocation;
-
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
@@ -24,9 +23,11 @@ public interface TaskLifecycleListener {
      * @param taskRecord   Raw task data.
      * @param pickTaskTime Time spent on picking the task from the queue in millis.
      */
-    default void picked(@Nonnull QueueShardId shardId, @Nonnull QueueLocation location, @Nonnull TaskRecord taskRecord,
-                        long pickTaskTime) {
-    }
+    default void picked(
+            @Nonnull QueueShardId shardId,
+            @Nonnull QueueLocation location,
+            @Nonnull TaskRecord taskRecord,
+            long pickTaskTime) {}
 
     /**
      * The start event of task processing.
@@ -39,8 +40,8 @@ public interface TaskLifecycleListener {
      * @param location   Queue location.
      * @param taskRecord Raw task data.
      */
-    default void started(@Nonnull QueueShardId shardId, @Nonnull QueueLocation location, @Nonnull TaskRecord taskRecord) {
-    }
+    default void started(
+            @Nonnull QueueShardId shardId, @Nonnull QueueLocation location, @Nonnull TaskRecord taskRecord) {}
 
     /**
      * Event for completion of client logic when task processing.
@@ -55,9 +56,12 @@ public interface TaskLifecycleListener {
      * @param executionResult Result of task processing.
      * @param processTaskTime Time spent on task processing in millis, without the time for task picking from the queue.
      */
-    default void executed(@Nonnull QueueShardId shardId, @Nonnull QueueLocation location, @Nonnull TaskRecord taskRecord,
-                          @Nonnull TaskExecutionResult executionResult, long processTaskTime) {
-    }
+    default void executed(
+            @Nonnull QueueShardId shardId,
+            @Nonnull QueueLocation location,
+            @Nonnull TaskRecord taskRecord,
+            @Nonnull TaskExecutionResult executionResult,
+            long processTaskTime) {}
 
     /**
      * Event for completion the task execution in the queue.
@@ -71,9 +75,8 @@ public interface TaskLifecycleListener {
      * @param location   Queue location.
      * @param taskRecord Raw task data.
      */
-    default void finished(@Nonnull QueueShardId shardId, @Nonnull QueueLocation location, @Nonnull TaskRecord taskRecord) {
-    }
-
+    default void finished(
+            @Nonnull QueueShardId shardId, @Nonnull QueueLocation location, @Nonnull TaskRecord taskRecord) {}
 
     /**
      * Event for abnormal queue processing.
@@ -87,8 +90,9 @@ public interface TaskLifecycleListener {
      * @param taskRecord Raw task data.
      * @param exc        An error caused the crash.
      */
-    default void crashed(@Nonnull QueueShardId shardId, @Nonnull QueueLocation location, @Nonnull TaskRecord taskRecord,
-                 @Nullable Exception exc) {
-    }
-
+    default void crashed(
+            @Nonnull QueueShardId shardId,
+            @Nonnull QueueLocation location,
+            @Nonnull TaskRecord taskRecord,
+            @Nullable Exception exc) {}
 }

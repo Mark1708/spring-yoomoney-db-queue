@@ -1,13 +1,12 @@
 package com.example.dbqueue.config;
 
-import com.example.dbqueue.api.TaskRecord;
+import static java.util.Objects.requireNonNull;
 
-import javax.annotation.Nonnull;
+import com.example.dbqueue.api.TaskRecord;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Pattern;
-
-import static java.util.Objects.requireNonNull;
+import javax.annotation.Nonnull;
 
 /**
  * Scheme for column names of queue table in the database.
@@ -21,32 +20,41 @@ public class QueueTableSchema {
 
     @Nonnull
     private final String idField;
+
     @Nonnull
     private final String queueNameField;
+
     @Nonnull
     private final String payloadField;
+
     @Nonnull
     private final String attemptField;
+
     @Nonnull
     private final String reenqueueAttemptField;
+
     @Nonnull
     private final String totalAttemptField;
+
     @Nonnull
     private final String createdAtField;
+
     @Nonnull
     private final String nextProcessAtField;
+
     @Nonnull
     private final List<String> extFields;
 
-    private QueueTableSchema(@Nonnull String idField,
-                             @Nonnull String queueNameField,
-                             @Nonnull String payloadField,
-                             @Nonnull String attemptField,
-                             @Nonnull String reenqueueAttemptField,
-                             @Nonnull String totalAttemptField,
-                             @Nonnull String createdAtField,
-                             @Nonnull String nextProcessAtField,
-                             @Nonnull List<String> extFields) {
+    private QueueTableSchema(
+            @Nonnull String idField,
+            @Nonnull String queueNameField,
+            @Nonnull String payloadField,
+            @Nonnull String attemptField,
+            @Nonnull String reenqueueAttemptField,
+            @Nonnull String totalAttemptField,
+            @Nonnull String createdAtField,
+            @Nonnull String nextProcessAtField,
+            @Nonnull List<String> extFields) {
         this.idField = removeSpecialChars(requireNonNull(idField));
         this.queueNameField = removeSpecialChars(requireNonNull(queueNameField));
         this.payloadField = removeSpecialChars(requireNonNull(payloadField));
@@ -55,7 +63,8 @@ public class QueueTableSchema {
         this.totalAttemptField = removeSpecialChars(requireNonNull(totalAttemptField));
         this.createdAtField = removeSpecialChars(requireNonNull(createdAtField));
         this.nextProcessAtField = removeSpecialChars(requireNonNull(nextProcessAtField));
-        this.extFields = requireNonNull(extFields).stream().map(QueueTableSchema::removeSpecialChars)
+        this.extFields = requireNonNull(extFields).stream()
+                .map(QueueTableSchema::removeSpecialChars)
                 .toList();
     }
 
@@ -183,8 +192,7 @@ public class QueueTableSchema {
         private String nextProcessAtField = "next_process_at";
         private List<String> extFields = new ArrayList<>();
 
-        private Builder() {
-        }
+        private Builder() {}
 
         public Builder withIdField(String idField) {
             this.idField = idField;
@@ -232,8 +240,16 @@ public class QueueTableSchema {
         }
 
         public QueueTableSchema build() {
-            return new QueueTableSchema(idField, queueNameField, payloadField, attemptField, reenqueueAttemptField,
-                    totalAttemptField, createdAtField, nextProcessAtField, extFields);
+            return new QueueTableSchema(
+                    idField,
+                    queueNameField,
+                    payloadField,
+                    attemptField,
+                    reenqueueAttemptField,
+                    totalAttemptField,
+                    createdAtField,
+                    nextProcessAtField,
+                    extFields);
         }
     }
 }

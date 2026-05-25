@@ -1,17 +1,17 @@
 package com.example.dbqueue.settings;
 
-import javax.annotation.Nonnull;
+import static com.example.dbqueue.settings.QueueConfigsReader.SETTING_BATCH_SIZE;
+import static com.example.dbqueue.settings.QueueConfigsReader.SETTING_BETWEEN_TASK_TIMEOUT;
+import static com.example.dbqueue.settings.QueueConfigsReader.SETTING_FATAL_CRASH_TIMEOUT;
+import static com.example.dbqueue.settings.QueueConfigsReader.SETTING_NO_TASK_TIMEOUT;
+
 import java.time.Duration;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.function.Supplier;
-
-import static com.example.dbqueue.settings.QueueConfigsReader.SETTING_BATCH_SIZE;
-import static com.example.dbqueue.settings.QueueConfigsReader.SETTING_BETWEEN_TASK_TIMEOUT;
-import static com.example.dbqueue.settings.QueueConfigsReader.SETTING_FATAL_CRASH_TIMEOUT;
-import static com.example.dbqueue.settings.QueueConfigsReader.SETTING_NO_TASK_TIMEOUT;
+import javax.annotation.Nonnull;
 
 /**
  * Parser for {@link PollSettings}
@@ -47,7 +47,8 @@ class PollSettingsParser {
             settings.forEach((key, value) -> fillSettings(pollSettings, key, value));
             return Optional.of(pollSettings.build());
         } catch (RuntimeException exc) {
-            errorMessages.add(String.format("cannot build poll settings: queueId=%s, msg=%s", queueId, exc.getMessage()));
+            errorMessages.add(
+                    String.format("cannot build poll settings: queueId=%s, msg=%s", queueId, exc.getMessage()));
             return Optional.empty();
         }
     }
@@ -59,13 +60,12 @@ class PollSettingsParser {
                 case SETTING_BETWEEN_TASK_TIMEOUT -> pollSettings.withBetweenTaskTimeout(Duration.parse(value));
                 case SETTING_FATAL_CRASH_TIMEOUT -> pollSettings.withFatalCrashTimeout(Duration.parse(value));
                 case SETTING_BATCH_SIZE -> pollSettings.withBatchSize(Integer.parseInt(value));
-                default -> {
-                }
+                default -> {}
             }
         } catch (RuntimeException exc) {
-            errorMessages.add(String.format("cannot parse setting: name=%s, value=%s, exception=%s", name, value,
-                    exc.getClass().getSimpleName() + '(' + exc.getMessage() + ')'));
+            errorMessages.add(String.format(
+                    "cannot parse setting: name=%s, value=%s, exception=%s",
+                    name, value, exc.getClass().getSimpleName() + '(' + exc.getMessage() + ')'));
         }
     }
-
 }

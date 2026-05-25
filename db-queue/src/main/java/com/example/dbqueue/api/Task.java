@@ -1,16 +1,15 @@
 package com.example.dbqueue.api;
 
-import com.example.dbqueue.config.QueueShardId;
+import static java.util.Objects.requireNonNull;
 
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
+import com.example.dbqueue.config.QueueShardId;
 import java.time.ZonedDateTime;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
-
-import static java.util.Objects.requireNonNull;
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 
 /**
  * Typed task wrapper with parameters, which is supplied to the {@linkplain QueueConsumer} task processor
@@ -21,13 +20,17 @@ public final class Task<PayloadT> {
 
     @Nonnull
     private final QueueShardId shardId;
+
     @Nullable
     private final PayloadT payload;
+
     private final long attemptsCount;
     private final long reenqueueAttemptsCount;
     private final long totalAttemptsCount;
+
     @Nonnull
     private final ZonedDateTime createdAt;
+
     @Nonnull
     private final Map<String, String> extData;
 
@@ -43,9 +46,14 @@ public final class Task<PayloadT> {
      * @param createdAt              Date and time when the task was added into the queue.
      * @param extData                Map of external user-defined parameters, key is the column name in the tasks table.
      */
-    private Task(@Nonnull QueueShardId shardId, @Nullable PayloadT payload,
-                 long attemptsCount, long reenqueueAttemptsCount, long totalAttemptsCount,
-                 @Nonnull ZonedDateTime createdAt, @Nonnull Map<String, String> extData) {
+    private Task(
+            @Nonnull QueueShardId shardId,
+            @Nullable PayloadT payload,
+            long attemptsCount,
+            long reenqueueAttemptsCount,
+            long totalAttemptsCount,
+            @Nonnull ZonedDateTime createdAt,
+            @Nonnull Map<String, String> extData) {
         this.shardId = requireNonNull(shardId, "shardId");
         this.payload = payload;
         this.attemptsCount = attemptsCount;
@@ -146,31 +154,30 @@ public final class Task<PayloadT> {
             return false;
         }
         Task<?> task = (Task<?>) obj;
-        return attemptsCount == task.attemptsCount &&
-                reenqueueAttemptsCount == task.reenqueueAttemptsCount &&
-                totalAttemptsCount == task.totalAttemptsCount &&
-                Objects.equals(shardId, task.shardId) &&
-                Objects.equals(payload, task.payload) &&
-                Objects.equals(createdAt, task.createdAt) &&
-                Objects.equals(extData, task.extData);
+        return attemptsCount == task.attemptsCount
+                && reenqueueAttemptsCount == task.reenqueueAttemptsCount
+                && totalAttemptsCount == task.totalAttemptsCount
+                && Objects.equals(shardId, task.shardId)
+                && Objects.equals(payload, task.payload)
+                && Objects.equals(createdAt, task.createdAt)
+                && Objects.equals(extData, task.extData);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(shardId, payload, attemptsCount, reenqueueAttemptsCount,
-                totalAttemptsCount, createdAt, extData);
+        return Objects.hash(
+                shardId, payload, attemptsCount, reenqueueAttemptsCount, totalAttemptsCount, createdAt, extData);
     }
 
     @Override
     public String toString() {
-        return '{' +
-                "shardId=" + shardId +
-                ", attemptsCount=" + attemptsCount +
-                ", reenqueueAttemptsCount=" + reenqueueAttemptsCount +
-                ", totalAttemptsCount=" + totalAttemptsCount +
-                ", createdAt=" + createdAt +
-                ", payload=" + payload +
-                '}';
+        return '{' + "shardId="
+                + shardId + ", attemptsCount="
+                + attemptsCount + ", reenqueueAttemptsCount="
+                + reenqueueAttemptsCount + ", totalAttemptsCount="
+                + totalAttemptsCount + ", createdAt="
+                + createdAt + ", payload="
+                + payload + '}';
     }
 
     /**
@@ -192,12 +199,15 @@ public final class Task<PayloadT> {
     public static class Builder<PayloadBuilderT> {
         @Nonnull
         private final QueueShardId shardId;
+
         @Nonnull
         private ZonedDateTime createdAt = ZonedDateTime.now();
+
         private PayloadBuilderT payload;
         private long attemptsCount;
         private long reenqueueAttemptsCount;
         private long totalAttemptsCount;
+
         @Nonnull
         private Map<String, String> extData = new LinkedHashMap<>();
 
@@ -236,8 +246,8 @@ public final class Task<PayloadT> {
         }
 
         public Task<PayloadBuilderT> build() {
-            return new Task<>(shardId, payload, attemptsCount, reenqueueAttemptsCount,
-                    totalAttemptsCount, createdAt, extData);
+            return new Task<>(
+                    shardId, payload, attemptsCount, reenqueueAttemptsCount, totalAttemptsCount, createdAt, extData);
         }
     }
 }

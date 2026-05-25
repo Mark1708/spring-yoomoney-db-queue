@@ -2,10 +2,9 @@ package com.example.dbqueue.api;
 
 import com.example.dbqueue.settings.ProcessingMode;
 import com.example.dbqueue.settings.QueueConfig;
-
-import javax.annotation.Nonnull;
 import java.util.Optional;
 import java.util.concurrent.Executor;
+import javax.annotation.Nonnull;
 
 /**
  * Task processor for the queue
@@ -48,5 +47,4 @@ public interface QueueConsumer<PayloadT> {
     default Optional<Executor> getExecutor() {
         return Optional.empty();
     }
-
 }

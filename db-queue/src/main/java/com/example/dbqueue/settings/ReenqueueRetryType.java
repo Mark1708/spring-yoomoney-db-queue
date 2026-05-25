@@ -2,7 +2,6 @@ package com.example.dbqueue.settings;
 
 import com.example.dbqueue.api.TaskExecutionResult;
 import com.example.dbqueue.api.TaskRecord;
-
 import java.time.Duration;
 
 /**

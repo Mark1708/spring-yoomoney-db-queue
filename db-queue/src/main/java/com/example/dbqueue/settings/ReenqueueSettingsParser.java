@@ -1,6 +1,5 @@
 package com.example.dbqueue.settings;
 
-import javax.annotation.Nonnull;
 import java.time.Duration;
 import java.util.Arrays;
 import java.util.List;
@@ -8,6 +7,7 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.function.Supplier;
+import javax.annotation.Nonnull;
 
 /**
  * Parser for {@link ReenqueueSettings}
@@ -23,8 +23,7 @@ class ReenqueueSettingsParser {
      * @param defaultSettings default settings
      * @param errorMessages   list of error messages
      */
-    ReenqueueSettingsParser(@Nonnull Supplier<ReenqueueSettings.Builder> defaultSettings,
-                            List<String> errorMessages) {
+    ReenqueueSettingsParser(@Nonnull Supplier<ReenqueueSettings.Builder> defaultSettings, List<String> errorMessages) {
         this.defaultSettings = Objects.requireNonNull(defaultSettings, "defaultSettings");
         this.errorMessages = Objects.requireNonNull(errorMessages, "errorMessages");
     }
@@ -44,7 +43,8 @@ class ReenqueueSettingsParser {
             settings.forEach((key, value) -> fillSettings(reenqueueSettings, key, value));
             return Optional.of(reenqueueSettings.build());
         } catch (RuntimeException exc) {
-            errorMessages.add(String.format("cannot build reenqueue settings: queueId=%s, msg=%s", queueId, exc.getMessage()));
+            errorMessages.add(
+                    String.format("cannot build reenqueue settings: queueId=%s, msg=%s", queueId, exc.getMessage()));
             return Optional.empty();
         }
     }
@@ -52,18 +52,23 @@ class ReenqueueSettingsParser {
     private void fillSettings(ReenqueueSettings.Builder builder, String name, String value) {
         try {
             switch (name) {
-                case QueueConfigsReader.SETTING_REENQUEUE_RETRY_TYPE -> builder.withRetryType(parseReenqueueRetryType(value));
-                case QueueConfigsReader.SETTING_REENQUEUE_RETRY_PLAN -> builder.withSequentialPlan(parseReenqueueRetryPlan(value));
+                case QueueConfigsReader.SETTING_REENQUEUE_RETRY_TYPE ->
+                    builder.withRetryType(parseReenqueueRetryType(value));
+                case QueueConfigsReader.SETTING_REENQUEUE_RETRY_PLAN ->
+                    builder.withSequentialPlan(parseReenqueueRetryPlan(value));
                 case QueueConfigsReader.SETTING_REENQUEUE_RETRY_DELAY -> builder.withFixedDelay(Duration.parse(value));
-                case QueueConfigsReader.SETTING_REENQUEUE_RETRY_INITIAL_DELAY -> builder.withInitialDelay(Duration.parse(value));
-                case QueueConfigsReader.SETTING_REENQUEUE_RETRY_STEP -> builder.withArithmeticStep(Duration.parse(value));
-                case QueueConfigsReader.SETTING_REENQUEUE_RETRY_RATIO -> builder.withGeometricRatio(Long.valueOf(value));
-                default -> {
-                }
+                case QueueConfigsReader.SETTING_REENQUEUE_RETRY_INITIAL_DELAY ->
+                    builder.withInitialDelay(Duration.parse(value));
+                case QueueConfigsReader.SETTING_REENQUEUE_RETRY_STEP ->
+                    builder.withArithmeticStep(Duration.parse(value));
+                case QueueConfigsReader.SETTING_REENQUEUE_RETRY_RATIO ->
+                    builder.withGeometricRatio(Long.valueOf(value));
+                default -> {}
             }
         } catch (RuntimeException exc) {
-            errorMessages.add(String.format("cannot parse setting: name=%s, value=%s, exception=%s", name, value,
-                    exc.getClass().getSimpleName() + '(' + exc.getMessage() + ')'));
+            errorMessages.add(String.format(
+                    "cannot parse setting: name=%s, value=%s, exception=%s",
+                    name, value, exc.getClass().getSimpleName() + '(' + exc.getMessage() + ')'));
         }
     }
 
@@ -80,8 +85,6 @@ class ReenqueueSettingsParser {
 
     private static List<Duration> parseReenqueueRetryPlan(String plan) {
         String[] values = plan.split(",");
-        return Arrays.stream(values)
-                .map(Duration::parse)
-                .toList();
+        return Arrays.stream(values).map(Duration::parse).toList();
     }
 }

@@ -1,7 +1,6 @@
 package com.example.dbqueue.config;
 
 import com.example.dbqueue.settings.QueueLocation;
-
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
@@ -20,8 +19,7 @@ public interface ThreadLifecycleListener {
      * @param shardId  Shard identifier, which processes the queue.
      * @param location Queue location.
      */
-    default void started(@Nonnull QueueShardId shardId, @Nonnull QueueLocation location) {
-    }
+    default void started(@Nonnull QueueShardId shardId, @Nonnull QueueLocation location) {}
 
     /**
      * Thread was executed and finished processing.
@@ -35,8 +33,7 @@ public interface ThreadLifecycleListener {
      * @param taskProcessed  Attribute that task was taken and processed, no tasks for processing otherwise.
      * @param threadBusyTime Time in millis of the thread was running active before sleep.
      */
-    default void executed(QueueShardId shardId, QueueLocation location, boolean taskProcessed, long threadBusyTime) {
-    }
+    default void executed(QueueShardId shardId, QueueLocation location, boolean taskProcessed, long threadBusyTime) {}
 
     /**
      * End of the task processing lifecycle and start of the new one.
@@ -48,8 +45,7 @@ public interface ThreadLifecycleListener {
      * @param shardId  Shard identifier, which processes the queue.
      * @param location Queue location.
      */
-    default void finished(@Nonnull QueueShardId shardId, @Nonnull QueueLocation location) {
-    }
+    default void finished(@Nonnull QueueShardId shardId, @Nonnull QueueLocation location) {}
 
     /**
      * Queue failed with fatal error.
@@ -63,9 +59,8 @@ public interface ThreadLifecycleListener {
      * @param location Queue location.
      * @param exc      An error caused the crash.
      */
-    default void crashed(@Nonnull QueueShardId shardId, @Nonnull QueueLocation location, @Nullable Throwable exc) {
-    }
-    
+    default void crashed(@Nonnull QueueShardId shardId, @Nonnull QueueLocation location, @Nullable Throwable exc) {}
+
     /**
      * Queue didn't find tasks.
      * <p>
@@ -77,9 +72,8 @@ public interface ThreadLifecycleListener {
      * @param shardId  Shard identifier, which processes the queue.
      * @param location Queue location.
      */
-    default void noTask(@Nonnull QueueShardId shardId, @Nonnull QueueLocation location) {
-    }
-    
+    default void noTask(@Nonnull QueueShardId shardId, @Nonnull QueueLocation location) {}
+
     /**
      * The task was processed.
      * <p>
@@ -93,7 +87,5 @@ public interface ThreadLifecycleListener {
      * @param shardId  Shard identifier, which processes the queue.
      * @param location Queue location.
      */
-    default void processed(@Nonnull QueueShardId shardId, @Nonnull QueueLocation location) {
-    }
-    
+    default void processed(@Nonnull QueueShardId shardId, @Nonnull QueueLocation location) {}
 }

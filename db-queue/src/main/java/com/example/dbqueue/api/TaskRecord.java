@@ -1,26 +1,31 @@
 package com.example.dbqueue.api;
 
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
 import java.time.ZonedDateTime;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Objects;
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 
 /**
  * Raw database record with task parameters and payload
  */
 public final class TaskRecord {
     private final long id;
+
     @Nullable
     private final String payload;
+
     private final long attemptsCount;
     private final long reenqueueAttemptsCount;
     private final long totalAttemptsCount;
+
     @Nonnull
     private final ZonedDateTime createdAt;
+
     @Nonnull
     private final ZonedDateTime nextProcessAt;
+
     @Nonnull
     private final Map<String, String> extData;
 
@@ -36,14 +41,15 @@ public final class TaskRecord {
      * @param nextProcessAt          Date and time of the next task execution.
      * @param extData                Map of external user-defined parameters, key is the column name in the tasks table.
      */
-    private TaskRecord(long id,
-                       @Nullable String payload,
-                       long attemptsCount,
-                       long reenqueueAttemptsCount,
-                       long totalAttemptsCount,
-                       @Nonnull ZonedDateTime createdAt,
-                       @Nonnull ZonedDateTime nextProcessAt,
-                       @Nonnull Map<String, String> extData) {
+    private TaskRecord(
+            long id,
+            @Nullable String payload,
+            long attemptsCount,
+            long reenqueueAttemptsCount,
+            long totalAttemptsCount,
+            @Nonnull ZonedDateTime createdAt,
+            @Nonnull ZonedDateTime nextProcessAt,
+            @Nonnull Map<String, String> extData) {
         this.id = id;
         this.payload = payload;
         this.attemptsCount = attemptsCount;
@@ -143,32 +149,38 @@ public final class TaskRecord {
             return false;
         }
         TaskRecord that = (TaskRecord) obj;
-        return id == that.id &&
-                attemptsCount == that.attemptsCount &&
-                reenqueueAttemptsCount == that.reenqueueAttemptsCount &&
-                totalAttemptsCount == that.totalAttemptsCount &&
-                Objects.equals(payload, that.payload) &&
-                Objects.equals(createdAt, that.createdAt) &&
-                Objects.equals(nextProcessAt, that.nextProcessAt) &&
-                Objects.equals(extData, that.extData);
+        return id == that.id
+                && attemptsCount == that.attemptsCount
+                && reenqueueAttemptsCount == that.reenqueueAttemptsCount
+                && totalAttemptsCount == that.totalAttemptsCount
+                && Objects.equals(payload, that.payload)
+                && Objects.equals(createdAt, that.createdAt)
+                && Objects.equals(nextProcessAt, that.nextProcessAt)
+                && Objects.equals(extData, that.extData);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, payload, attemptsCount, reenqueueAttemptsCount, totalAttemptsCount,
-                createdAt, nextProcessAt, extData);
+        return Objects.hash(
+                id,
+                payload,
+                attemptsCount,
+                reenqueueAttemptsCount,
+                totalAttemptsCount,
+                createdAt,
+                nextProcessAt,
+                extData);
     }
 
     @Override
     public String toString() {
-        return '{' +
-                "id=" + id +
-                ", attemptsCount=" + attemptsCount +
-                ", reenqueueAttemptsCount=" + reenqueueAttemptsCount +
-                ", totalAttemptsCount=" + totalAttemptsCount +
-                ", createdAt=" + createdAt +
-                ", nextProcessAt=" + nextProcessAt +
-                '}';
+        return '{' + "id="
+                + id + ", attemptsCount="
+                + attemptsCount + ", reenqueueAttemptsCount="
+                + reenqueueAttemptsCount + ", totalAttemptsCount="
+                + totalAttemptsCount + ", createdAt="
+                + createdAt + ", nextProcessAt="
+                + nextProcessAt + '}';
     }
 
     public static Builder builder() {
@@ -180,20 +192,24 @@ public final class TaskRecord {
      */
     public static class Builder {
         private long id;
+
         @Nullable
         private String payload;
+
         private long attemptsCount;
         private long reenqueueAttemptsCount;
         private long totalAttemptsCount;
+
         @Nonnull
         private ZonedDateTime createdAt = ZonedDateTime.now();
+
         @Nonnull
         private ZonedDateTime nextProcessAt = ZonedDateTime.now();
+
         @Nonnull
         private Map<String, String> extData = new LinkedHashMap<>();
 
-        private Builder() {
-        }
+        private Builder() {}
 
         public Builder withCreatedAt(@Nonnull ZonedDateTime createdAt) {
             this.createdAt = Objects.requireNonNull(createdAt, "createdAt");
@@ -236,8 +252,15 @@ public final class TaskRecord {
         }
 
         public TaskRecord build() {
-            return new TaskRecord(id, payload, attemptsCount, reenqueueAttemptsCount,
-                    totalAttemptsCount, createdAt, nextProcessAt, extData);
+            return new TaskRecord(
+                    id,
+                    payload,
+                    attemptsCount,
+                    reenqueueAttemptsCount,
+                    totalAttemptsCount,
+                    createdAt,
+                    nextProcessAt,
+                    extData);
         }
     }
 }

@@ -1,17 +1,16 @@
 package com.example.dbqueue.internal.runner;
 
+import static java.util.Objects.requireNonNull;
+
 import com.example.dbqueue.api.QueueConsumer;
 import com.example.dbqueue.api.TaskRecord;
 import com.example.dbqueue.internal.processing.QueueProcessingStatus;
 import com.example.dbqueue.internal.processing.TaskPicker;
 import com.example.dbqueue.internal.processing.TaskProcessor;
 import com.example.dbqueue.settings.ProcessingMode;
-
-import javax.annotation.Nonnull;
 import java.util.List;
 import java.util.concurrent.Executor;
-
-import static java.util.Objects.requireNonNull;
+import javax.annotation.Nonnull;
 
 /**
  * Исполнитель задач очереди в режиме
@@ -21,8 +20,10 @@ class QueueRunnerInExternalExecutor implements QueueRunner {
 
     @Nonnull
     private final TaskPicker taskPicker;
+
     @Nonnull
     private final TaskProcessor taskProcessor;
+
     @Nonnull
     private final Executor executor;
 
@@ -33,9 +34,8 @@ class QueueRunnerInExternalExecutor implements QueueRunner {
      * @param taskProcessor обработчик задачи
      * @param executor      исполнитель задачи
      */
-    QueueRunnerInExternalExecutor(@Nonnull TaskPicker taskPicker,
-                                  @Nonnull TaskProcessor taskProcessor,
-                                  @Nonnull Executor executor) {
+    QueueRunnerInExternalExecutor(
+            @Nonnull TaskPicker taskPicker, @Nonnull TaskProcessor taskProcessor, @Nonnull Executor executor) {
         this.taskPicker = requireNonNull(taskPicker);
         this.taskProcessor = requireNonNull(taskProcessor);
         this.executor = requireNonNull(executor);
@@ -48,9 +48,7 @@ class QueueRunnerInExternalExecutor implements QueueRunner {
         if (taskRecords.isEmpty()) {
             return QueueProcessingStatus.SKIPPED;
         }
-        taskRecords.forEach(taskRecord ->
-                executor.execute(() -> taskProcessor.processTask(queueConsumer, taskRecord)));
+        taskRecords.forEach(taskRecord -> executor.execute(() -> taskProcessor.processTask(queueConsumer, taskRecord)));
         return QueueProcessingStatus.PROCESSED;
     }
-
 }

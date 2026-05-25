@@ -1,10 +1,5 @@
 package com.example.dbqueue.api.impl;
 
-import java.util.List;
-import java.util.Objects;
-import java.util.stream.Collectors;
-import javax.annotation.Nonnull;
-
 import com.example.dbqueue.api.EnqueueParams;
 import com.example.dbqueue.api.EnqueueResult;
 import com.example.dbqueue.api.QueueProducer;
@@ -13,6 +8,10 @@ import com.example.dbqueue.api.TaskPayloadTransformer;
 import com.example.dbqueue.config.DatabaseAccessLayer;
 import com.example.dbqueue.config.QueueShard;
 import com.example.dbqueue.settings.QueueConfig;
+import java.util.List;
+import java.util.Objects;
+import java.util.stream.Collectors;
+import javax.annotation.Nonnull;
 
 /**
  * Wrapper for queue producer wrapper with sharding support.
@@ -25,8 +24,10 @@ public class ShardingQueueProducer<PayloadTaskT, DatabaseAccessLayerT extends Da
 
     @Nonnull
     private final QueueShardRouter<PayloadTaskT, DatabaseAccessLayerT> queueShardRouter;
+
     @Nonnull
     private final TaskPayloadTransformer<PayloadTaskT> payloadTransformer;
+
     @Nonnull
     private final QueueConfig queueConfig;
 
@@ -37,9 +38,10 @@ public class ShardingQueueProducer<PayloadTaskT, DatabaseAccessLayerT extends Da
      * @param payloadTransformer Transformer of a payload data
      * @param queueShardRouter   Dispatcher for sharding support
      */
-    public ShardingQueueProducer(@Nonnull QueueConfig queueConfig,
-                                 @Nonnull TaskPayloadTransformer<PayloadTaskT> payloadTransformer,
-                                 @Nonnull QueueShardRouter<PayloadTaskT, DatabaseAccessLayerT> queueShardRouter) {
+    public ShardingQueueProducer(
+            @Nonnull QueueConfig queueConfig,
+            @Nonnull TaskPayloadTransformer<PayloadTaskT> payloadTransformer,
+            @Nonnull QueueShardRouter<PayloadTaskT, DatabaseAccessLayerT> queueShardRouter) {
         this.queueShardRouter = Objects.requireNonNull(queueShardRouter);
         this.payloadTransformer = Objects.requireNonNull(payloadTransformer);
         this.queueConfig = Objects.requireNonNull(queueConfig);
@@ -52,8 +54,12 @@ public class ShardingQueueProducer<PayloadTaskT, DatabaseAccessLayerT extends Da
                 .withPayload(payloadTransformer.fromObject(enqueueParams.getPayload()))
                 .withExecutionDelay(enqueueParams.getExecutionDelay())
                 .withExtData(enqueueParams.getExtData());
-        Long enqueueId = queueShard.getDatabaseAccessLayer().transact(() ->
-                queueShard.getDatabaseAccessLayer().getQueueDao().enqueue(queueConfig.getLocation(), rawEnqueueParams));
+        Long enqueueId = queueShard
+                .getDatabaseAccessLayer()
+                .transact(() -> queueShard
+                        .getDatabaseAccessLayer()
+                        .getQueueDao()
+                        .enqueue(queueConfig.getLocation(), rawEnqueueParams));
         return EnqueueResult.builder()
                 .withShardId(queueShard.getShardId())
                 .withEnqueueId(enqueueId)
@@ -64,17 +70,19 @@ public class ShardingQueueProducer<PayloadTaskT, DatabaseAccessLayerT extends Da
     public void enqueueBatch(@Nonnull List<EnqueueParams<PayloadTaskT>> enqueueParams) {
         enqueueParams.stream()
                 .collect(Collectors.groupingBy(queueShardRouter::resolveShard))
-                .forEach((queueShard, params) -> queueShard.getDatabaseAccessLayer().transact(
-                        () -> queueShard.getDatabaseAccessLayer().getQueueDao().enqueueBatch(
-                                queueConfig.getLocation(), 
-                                params.stream()
-                                        .map(it -> new EnqueueParams<String>()
-                                                .withPayload(payloadTransformer.fromObject(it.getPayload()))
-                                                .withExecutionDelay(it.getExecutionDelay())
-                                                .withExtData(it.getExtData()))
-                                        .toList()
-                        )
-                ));
+                .forEach((queueShard, params) -> queueShard
+                        .getDatabaseAccessLayer()
+                        .transact(() -> queueShard
+                                .getDatabaseAccessLayer()
+                                .getQueueDao()
+                                .enqueueBatch(
+                                        queueConfig.getLocation(),
+                                        params.stream()
+                                                .map(it -> new EnqueueParams<String>()
+                                                        .withPayload(payloadTransformer.fromObject(it.getPayload()))
+                                                        .withExecutionDelay(it.getExecutionDelay())
+                                                        .withExtData(it.getExtData()))
+                                                .toList())));
     }
 
     @Nonnull

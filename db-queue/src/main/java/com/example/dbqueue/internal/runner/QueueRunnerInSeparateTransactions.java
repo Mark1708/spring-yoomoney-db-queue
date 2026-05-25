@@ -1,16 +1,15 @@
 package com.example.dbqueue.internal.runner;
 
+import static java.util.Objects.requireNonNull;
+
 import com.example.dbqueue.api.QueueConsumer;
 import com.example.dbqueue.api.TaskRecord;
 import com.example.dbqueue.internal.processing.QueueProcessingStatus;
 import com.example.dbqueue.internal.processing.TaskPicker;
 import com.example.dbqueue.internal.processing.TaskProcessor;
 import com.example.dbqueue.settings.ProcessingMode;
-
-import javax.annotation.Nonnull;
 import java.util.List;
-
-import static java.util.Objects.requireNonNull;
+import javax.annotation.Nonnull;
 
 /**
  * Исполнитель задач очереди в режиме
@@ -20,6 +19,7 @@ class QueueRunnerInSeparateTransactions implements QueueRunner {
 
     @Nonnull
     private final TaskPicker taskPicker;
+
     @Nonnull
     private final TaskProcessor taskProcessor;
 
@@ -29,11 +29,9 @@ class QueueRunnerInSeparateTransactions implements QueueRunner {
      * @param taskPicker    выборщик задачи
      * @param taskProcessor обработчик задачи
      */
-    QueueRunnerInSeparateTransactions(@Nonnull TaskPicker taskPicker,
-                                      @Nonnull TaskProcessor taskProcessor) {
+    QueueRunnerInSeparateTransactions(@Nonnull TaskPicker taskPicker, @Nonnull TaskProcessor taskProcessor) {
         this.taskPicker = requireNonNull(taskPicker);
         this.taskProcessor = requireNonNull(taskProcessor);
-
     }
 
     @Override
@@ -46,5 +44,4 @@ class QueueRunnerInSeparateTransactions implements QueueRunner {
         taskRecords.forEach(taskRecord -> taskProcessor.processTask(queueConsumer, taskRecord));
         return QueueProcessingStatus.PROCESSED;
     }
-
 }

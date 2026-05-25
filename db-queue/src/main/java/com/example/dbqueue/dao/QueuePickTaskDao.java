@@ -1,9 +1,8 @@
 package com.example.dbqueue.dao;
 
 import com.example.dbqueue.api.TaskRecord;
-
-import javax.annotation.Nonnull;
 import java.util.List;
+import javax.annotation.Nonnull;
 
 /**
  * Database access object to pick up tasks in the queue.

@@ -1,10 +1,5 @@
 package com.example.dbqueue.settings;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import javax.annotation.Nonnull;
-import javax.annotation.concurrent.ThreadSafe;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Files;
@@ -24,6 +19,10 @@ import java.util.function.Supplier;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
+import javax.annotation.Nonnull;
+import javax.annotation.concurrent.ThreadSafe;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Reads queue configuration from file.
@@ -207,6 +206,7 @@ public class QueueConfigsReader {
      * Representation of {@link PollSettings#getBatchSize()}
      */
     public static final String SETTING_BATCH_SIZE = "batch-size";
+
     @Deprecated(forRemoval = true)
     public static final String SETTING_QUERY_VERSION = "query-version";
     /**
@@ -233,22 +233,40 @@ public class QueueConfigsReader {
     private final List<String> errorMessages = new ArrayList<>();
 
     private static final Set<String> ALLOWED_SETTINGS = new HashSet<>(Arrays.asList(
-            SETTING_PROCESSING_MODE, SETTING_BETWEEN_TASK_TIMEOUT, SETTING_TABLE,
-            SETTING_NO_TASK_TIMEOUT, SETTING_ID_SEQUENCE, SETTING_FATAL_CRASH_TIMEOUT, SETTING_BATCH_SIZE, SETTING_QUERY_VERSION,
-            SETTING_REENQUEUE_RETRY_DELAY, SETTING_REENQUEUE_RETRY_PLAN, SETTING_REENQUEUE_RETRY_INITIAL_DELAY,
-            SETTING_REENQUEUE_RETRY_RATIO, SETTING_REENQUEUE_RETRY_TYPE, SETTING_REENQUEUE_RETRY_STEP,
-            SETTING_RETRY_TYPE, SETTING_RETRY_INTERVAL, SETTING_THREAD_COUNT, SETTING_THREAD_COUNT));
+            SETTING_PROCESSING_MODE,
+            SETTING_BETWEEN_TASK_TIMEOUT,
+            SETTING_TABLE,
+            SETTING_NO_TASK_TIMEOUT,
+            SETTING_ID_SEQUENCE,
+            SETTING_FATAL_CRASH_TIMEOUT,
+            SETTING_BATCH_SIZE,
+            SETTING_QUERY_VERSION,
+            SETTING_REENQUEUE_RETRY_DELAY,
+            SETTING_REENQUEUE_RETRY_PLAN,
+            SETTING_REENQUEUE_RETRY_INITIAL_DELAY,
+            SETTING_REENQUEUE_RETRY_RATIO,
+            SETTING_REENQUEUE_RETRY_TYPE,
+            SETTING_REENQUEUE_RETRY_STEP,
+            SETTING_RETRY_TYPE,
+            SETTING_RETRY_INTERVAL,
+            SETTING_THREAD_COUNT,
+            SETTING_THREAD_COUNT));
 
     @Nonnull
     private final List<Path> configPaths;
+
     @Nonnull
     private final String settingsPrefix;
+
     @Nonnull
     private final Supplier<ProcessingSettings.Builder> defaultProcessingSettings;
+
     @Nonnull
     private final Supplier<PollSettings.Builder> defaultPollSettings;
+
     @Nonnull
     private final Supplier<FailureSettings.Builder> defaultFailureSettings;
+
     @Nonnull
     private final Supplier<ReenqueueSettings.Builder> defaultReenqueueSettings;
 
@@ -259,8 +277,13 @@ public class QueueConfigsReader {
      * @param settingsPrefix prefix that will be used for queue settings.
      */
     public QueueConfigsReader(@Nonnull List<Path> configPaths, @Nonnull String settingsPrefix) {
-        this(configPaths, settingsPrefix, ProcessingSettings::builder, PollSettings::builder,
-                FailureSettings::builder, ReenqueueSettings::builder);
+        this(
+                configPaths,
+                settingsPrefix,
+                ProcessingSettings::builder,
+                PollSettings::builder,
+                FailureSettings::builder,
+                ReenqueueSettings::builder);
     }
 
     /**
@@ -273,12 +296,13 @@ public class QueueConfigsReader {
      * @param defaultFailureSettings    default {@link FailureSettings}
      * @param defaultReenqueueSettings  default {@link ReenqueueSettings}
      */
-    public QueueConfigsReader(@Nonnull List<Path> configPaths,
-                              @Nonnull String settingsPrefix,
-                              @Nonnull Supplier<ProcessingSettings.Builder> defaultProcessingSettings,
-                              @Nonnull Supplier<PollSettings.Builder> defaultPollSettings,
-                              @Nonnull Supplier<FailureSettings.Builder> defaultFailureSettings,
-                              @Nonnull Supplier<ReenqueueSettings.Builder> defaultReenqueueSettings) {
+    public QueueConfigsReader(
+            @Nonnull List<Path> configPaths,
+            @Nonnull String settingsPrefix,
+            @Nonnull Supplier<ProcessingSettings.Builder> defaultProcessingSettings,
+            @Nonnull Supplier<PollSettings.Builder> defaultPollSettings,
+            @Nonnull Supplier<FailureSettings.Builder> defaultFailureSettings,
+            @Nonnull Supplier<ReenqueueSettings.Builder> defaultReenqueueSettings) {
         this.configPaths = Objects.requireNonNull(configPaths);
         this.settingsPrefix = Objects.requireNonNull(settingsPrefix);
         this.defaultProcessingSettings = Objects.requireNonNull(defaultProcessingSettings);
@@ -288,7 +312,8 @@ public class QueueConfigsReader {
         if (configPaths.isEmpty()) {
             throw new IllegalArgumentException("config paths must not be empty");
         }
-        List<Path> illegalConfigs = configPaths.stream().filter(path -> !path.toFile().isFile()).toList();
+        List<Path> illegalConfigs =
+                configPaths.stream().filter(path -> !path.toFile().isFile()).toList();
         if (!illegalConfigs.isEmpty()) {
             throw new IllegalArgumentException("config path must be a file: files=" + illegalConfigs);
         }
@@ -316,21 +341,20 @@ public class QueueConfigsReader {
         Map<String, String> rawSettings = readRawSettings(configPath);
         if (configPaths.size() > 1) {
             List<Path> overrideConfigPaths = configPaths.subList(1, configPaths.size());
-            overrideConfigPaths.stream().filter(Objects::nonNull).forEach(path ->
-                    overrideExistingSettings(rawSettings, readRawSettings(path)));
+            overrideConfigPaths.stream()
+                    .filter(Objects::nonNull)
+                    .forEach(path -> overrideExistingSettings(rawSettings, readRawSettings(path)));
         }
 
         Map<String, Map<String, String>> queues = splitRawSettingsByQueueId(rawSettings);
 
         QueueLocationParser queueLocationParser = new QueueLocationParser(errorMessages);
-        ProcessingSettingsParser processingSettingsParser = new ProcessingSettingsParser(defaultProcessingSettings,
-                errorMessages);
-        PollSettingsParser pollSettingsParser = new PollSettingsParser(defaultPollSettings,
-                errorMessages);
-        ReenqueueSettingsParser reenqueueSettingsParser = new ReenqueueSettingsParser(defaultReenqueueSettings,
-                errorMessages);
-        FailureSettingsParser failureSettingsParser = new FailureSettingsParser(defaultFailureSettings,
-                errorMessages);
+        ProcessingSettingsParser processingSettingsParser =
+                new ProcessingSettingsParser(defaultProcessingSettings, errorMessages);
+        PollSettingsParser pollSettingsParser = new PollSettingsParser(defaultPollSettings, errorMessages);
+        ReenqueueSettingsParser reenqueueSettingsParser =
+                new ReenqueueSettingsParser(defaultReenqueueSettings, errorMessages);
+        FailureSettingsParser failureSettingsParser = new FailureSettingsParser(defaultFailureSettings, errorMessages);
 
         List<QueueConfig> queueConfigs = new ArrayList<>();
         queues.forEach((queueId, settings) -> {
@@ -341,21 +365,24 @@ public class QueueConfigsReader {
             Optional<FailureSettings> failureSettings = failureSettingsParser.parseSettings(queueId, settings);
             Optional<ReenqueueSettings> reenqueueSettings = reenqueueSettingsParser.parseSettings(queueId, settings);
 
-            if (queueLocation.isPresent() && processingSettings.isPresent() && pollSettings.isPresent() &&
-                    failureSettings.isPresent() && reenqueueSettings.isPresent()) {
+            if (queueLocation.isPresent()
+                    && processingSettings.isPresent()
+                    && pollSettings.isPresent()
+                    && failureSettings.isPresent()
+                    && reenqueueSettings.isPresent()) {
                 QueueSettings queueSettings = QueueSettings.builder()
                         .withProcessingSettings(processingSettings.get())
                         .withPollSettings(pollSettings.get())
                         .withFailureSettings(failureSettings.get())
                         .withReenqueueSettings(reenqueueSettings.get())
-                        .withExtSettings(parseExtSettings(settings)).build();
+                        .withExtSettings(parseExtSettings(settings))
+                        .build();
                 queueConfigs.add(new QueueConfig(queueLocation.get(), queueSettings));
             }
         });
         checkErrors();
         return queueConfigs;
     }
-
 
     private Map<String, String> readRawSettings(Path filePath) {
         try (InputStream is = Files.newInputStream(filePath)) {
@@ -402,21 +429,23 @@ public class QueueConfigsReader {
         return ExtSettings.builder().withSettings(map).build();
     }
 
-
     private void checkErrors() {
         if (!errorMessages.isEmpty()) {
-            throw new IllegalArgumentException("Cannot parse queue settings:" + System.lineSeparator() +
-                    errorMessages.stream().sorted().collect(Collectors.joining(System.lineSeparator())));
+            throw new IllegalArgumentException("Cannot parse queue settings:" + System.lineSeparator()
+                    + errorMessages.stream().sorted().collect(Collectors.joining(System.lineSeparator())));
         }
     }
 
-    private static void overrideExistingSettings(Map<String, String> existingSettings,
-                                                 Map<String, String> newSettings) {
+    private static void overrideExistingSettings(
+            Map<String, String> existingSettings, Map<String, String> newSettings) {
         newSettings.forEach((key, newValue) -> {
             String existingValue = existingSettings.get(key);
             if (existingValue != null) {
-                log.info("overriding queue property: name={}, existingValue={}, newValue={}",
-                        key, existingValue, newValue);
+                log.info(
+                        "overriding queue property: name={}, existingValue={}, newValue={}",
+                        key,
+                        existingValue,
+                        newValue);
             }
             existingSettings.put(key, newValue);
         });
@@ -425,19 +454,20 @@ public class QueueConfigsReader {
     private Map<String, String> cleanupProperties(Map<String, String> rawProperties) {
         return rawProperties.entrySet().stream()
                 .filter(entry -> entry.getKey().startsWith(settingsPrefix))
-                .filter(entry -> entry.getValue() != null && !entry.getValue().trim().isEmpty())
-                .collect(Collectors.toMap(entry -> entry.getKey().trim(), entry -> entry.getValue().trim()));
+                .filter(entry ->
+                        entry.getValue() != null && !entry.getValue().trim().isEmpty())
+                .collect(Collectors.toMap(
+                        entry -> entry.getKey().trim(),
+                        entry -> entry.getValue().trim()));
     }
 
     private void validateSettings(Map<String, Map<String, String>> queuesSettings) {
         queuesSettings.forEach((queueId, settings) -> {
             for (String setting : settings.keySet()) {
                 if (!ALLOWED_SETTINGS.contains(setting) && !setting.startsWith(SETTING_ADDITIONAL + ".")) {
-                    errorMessages.add(
-                            String.format("%s setting is unknown: queueId=%s", setting, queueId));
+                    errorMessages.add(String.format("%s setting is unknown: queueId=%s", setting, queueId));
                 }
             }
         });
     }
-
 }
