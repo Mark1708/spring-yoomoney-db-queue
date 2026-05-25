@@ -1,11 +1,10 @@
 package org.example.test.repository;
 
+import java.util.Optional;
 import org.example.test.domain.TestMessageStat;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
-
-import java.util.Optional;
 
 @Repository
 public interface TestMessageStatRepository extends JpaRepository<TestMessageStat, Long> {

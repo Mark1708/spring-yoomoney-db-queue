@@ -1,9 +1,8 @@
 package com.example.starter.properties;
 
-import org.springframework.boot.context.properties.ConfigurationProperties;
-
 import java.util.HashMap;
 import java.util.Map;
+import org.springframework.boot.context.properties.ConfigurationProperties;
 
 @ConfigurationProperties(prefix = "spring.db-queue")
 public class DbQueueProperties {

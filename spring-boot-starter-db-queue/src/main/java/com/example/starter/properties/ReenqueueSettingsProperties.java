@@ -10,8 +10,7 @@ public class ReenqueueSettingsProperties {
         this.retryType = retryType;
     }
 
-    public ReenqueueSettingsProperties() {
-    }
+    public ReenqueueSettingsProperties() {}
 
     public ReenqueueRetryType getRetryType() {
         return retryType;

@@ -9,15 +9,15 @@ public class PollSettingsProperties {
     private Duration fatalCrashTimeout = Duration.ofSeconds(1L);
     private Integer batchSize = 1;
 
-    public PollSettingsProperties(Duration betweenTaskTimeout, Duration noTaskTimeout, Duration fatalCrashTimeout, Integer batchSize) {
+    public PollSettingsProperties(
+            Duration betweenTaskTimeout, Duration noTaskTimeout, Duration fatalCrashTimeout, Integer batchSize) {
         this.betweenTaskTimeout = betweenTaskTimeout;
         this.noTaskTimeout = noTaskTimeout;
         this.fatalCrashTimeout = fatalCrashTimeout;
         this.batchSize = batchSize;
     }
 
-    public PollSettingsProperties() {
-    }
+    public PollSettingsProperties() {}
 
     public Duration getBetweenTaskTimeout() {
         return betweenTaskTimeout;

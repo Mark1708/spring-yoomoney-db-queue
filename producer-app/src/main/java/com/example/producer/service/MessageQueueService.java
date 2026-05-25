@@ -6,17 +6,15 @@ import com.example.dbqueue.config.impl.LoggingTaskLifecycleListener;
 import com.example.dbqueue.config.impl.LoggingThreadLifecycleListener;
 import jakarta.annotation.PostConstruct;
 import jakarta.annotation.PreDestroy;
-import org.springframework.stereotype.Service;
-
 import java.time.Duration;
 import java.util.List;
+import org.springframework.stereotype.Service;
 
 @Service
 public class MessageQueueService extends QueueService {
 
     public MessageQueueService(List<QueueShard<?>> queueShards) {
-        super(queueShards, new LoggingThreadLifecycleListener(),
-                new LoggingTaskLifecycleListener());
+        super(queueShards, new LoggingThreadLifecycleListener(), new LoggingTaskLifecycleListener());
     }
 
     @PostConstruct

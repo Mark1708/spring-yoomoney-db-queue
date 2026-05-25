@@ -1,5 +1,9 @@
 package com.example.starter;
 
+import static java.util.Objects.requireNonNull;
+
+import com.example.dbqueue.config.DatabaseAccessLayer;
+import com.example.dbqueue.config.QueueTableSchema;
 import com.example.dbqueue.dao.QueueDao;
 import com.example.dbqueue.dao.QueuePickTaskDao;
 import com.example.dbqueue.settings.FailureSettings;
@@ -7,15 +11,10 @@ import com.example.dbqueue.settings.PollSettings;
 import com.example.dbqueue.settings.QueueLocation;
 import com.example.starter.dao.PostgresQueueDao;
 import com.example.starter.dao.PostgresQueuePickTaskDao;
+import java.util.function.Supplier;
+import javax.annotation.Nonnull;
 import org.springframework.jdbc.core.JdbcOperations;
 import org.springframework.transaction.support.TransactionOperations;
-import com.example.dbqueue.config.DatabaseAccessLayer;
-import com.example.dbqueue.config.QueueTableSchema;
-
-import javax.annotation.Nonnull;
-import java.util.function.Supplier;
-
-import static java.util.Objects.requireNonNull;
 
 /**
  * Class for interacting with database via Spring JDBC
@@ -24,13 +23,15 @@ public class SpringDatabaseAccessLayer implements DatabaseAccessLayer {
 
     @Nonnull
     private final JdbcOperations jdbcOperations;
+
     @Nonnull
     private final TransactionOperations transactionOperations;
+
     @Nonnull
     private final QueueTableSchema queueTableSchema;
+
     @Nonnull
     private final QueueDao queueDao;
-
 
     /**
      * Constructor
@@ -39,9 +40,10 @@ public class SpringDatabaseAccessLayer implements DatabaseAccessLayer {
      * @param jdbcOperations        Reference to Spring JDBC template.
      * @param transactionOperations Reference to Spring transaction template.
      */
-    public SpringDatabaseAccessLayer(@Nonnull QueueTableSchema queueTableSchema,
-                                     @Nonnull JdbcOperations jdbcOperations,
-                                     @Nonnull TransactionOperations transactionOperations) {
+    public SpringDatabaseAccessLayer(
+            @Nonnull QueueTableSchema queueTableSchema,
+            @Nonnull JdbcOperations jdbcOperations,
+            @Nonnull TransactionOperations transactionOperations) {
         this.queueTableSchema = requireNonNull(queueTableSchema);
         this.jdbcOperations = requireNonNull(jdbcOperations);
         this.transactionOperations = requireNonNull(transactionOperations);
@@ -54,11 +56,11 @@ public class SpringDatabaseAccessLayer implements DatabaseAccessLayer {
         return queueDao;
     }
 
-    private QueueDao createQueueDao(@Nonnull QueueTableSchema queueTableSchema,
-                                    @Nonnull JdbcOperations jdbcOperations) {
+    private QueueDao createQueueDao(
+            @Nonnull QueueTableSchema queueTableSchema, @Nonnull JdbcOperations jdbcOperations) {
         requireNonNull(jdbcOperations);
         requireNonNull(queueTableSchema);
-        return  new PostgresQueueDao(jdbcOperations, queueTableSchema);
+        return new PostgresQueueDao(jdbcOperations, queueTableSchema);
     }
 
     @Override
@@ -66,14 +68,13 @@ public class SpringDatabaseAccessLayer implements DatabaseAccessLayer {
     public QueuePickTaskDao createQueuePickTaskDao(
             @Nonnull QueueLocation queueLocation,
             @Nonnull FailureSettings failureSettings,
-            @Nonnull PollSettings pollSettings
-    ) {
+            @Nonnull PollSettings pollSettings) {
         requireNonNull(queueTableSchema);
         requireNonNull(queueLocation);
         requireNonNull(failureSettings);
         requireNonNull(pollSettings);
-        return  new PostgresQueuePickTaskDao(jdbcOperations, queueTableSchema,
-                    queueLocation, failureSettings, pollSettings);
+        return new PostgresQueuePickTaskDao(
+                jdbcOperations, queueTableSchema, queueLocation, failureSettings, pollSettings);
     }
 
     @Nonnull
@@ -96,7 +97,6 @@ public class SpringDatabaseAccessLayer implements DatabaseAccessLayer {
             return null;
         });
     }
-
 
     /**
      * Get reference to Spring JDBC template.

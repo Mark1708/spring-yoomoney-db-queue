@@ -11,8 +11,7 @@ public class ExtSettingsProperties {
         this.settings = settings;
     }
 
-    public ExtSettingsProperties() {
-    }
+    public ExtSettingsProperties() {}
 
     public Map<String, String> getSettings() {
         return settings;

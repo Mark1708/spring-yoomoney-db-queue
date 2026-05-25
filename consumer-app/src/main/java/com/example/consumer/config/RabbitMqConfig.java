@@ -24,10 +24,7 @@ public class RabbitMqConfig {
     }
 
     @Bean
-    public RabbitTemplate rabbitTemplate(
-            ConnectionFactory connectionFactory,
-            MessageConverter jacksonConverter
-    ) {
+    public RabbitTemplate rabbitTemplate(ConnectionFactory connectionFactory, MessageConverter jacksonConverter) {
         RabbitTemplate rabbitTemplate = new RabbitTemplate(connectionFactory);
         rabbitTemplate.setMessageConverter(jacksonConverter);
         return rabbitTemplate;
@@ -47,5 +44,4 @@ public class RabbitMqConfig {
     Binding binding(Queue queue, DirectExchange exchange) {
         return BindingBuilder.bind(queue).to(exchange).with("testRoutingKey");
     }
-
 }

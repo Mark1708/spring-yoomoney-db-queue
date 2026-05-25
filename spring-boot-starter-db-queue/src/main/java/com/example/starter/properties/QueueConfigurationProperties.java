@@ -1,8 +1,7 @@
 package com.example.starter.properties;
 
-import org.springframework.boot.context.properties.ConfigurationProperties;
-
 import java.util.List;
+import org.springframework.boot.context.properties.ConfigurationProperties;
 
 @ConfigurationProperties(prefix = "spring.db-queue.config")
 public class QueueConfigurationProperties {
@@ -17,13 +16,13 @@ public class QueueConfigurationProperties {
     private ExtSettingsProperties extSettings = new ExtSettingsProperties();
 
     public QueueConfigurationProperties(
-            String location, List<String> shards,
+            String location,
+            List<String> shards,
             ProcessingSettingsProperties processingSettings,
             PollSettingsProperties pollSettings,
             FailureSettingsProperties failureSettings,
             ReenqueueSettingsProperties reenqueueSettings,
-            ExtSettingsProperties extSettings
-    ) {
+            ExtSettingsProperties extSettings) {
         this.location = location;
         this.shards = shards;
         this.processingSettings = processingSettings;
@@ -33,8 +32,7 @@ public class QueueConfigurationProperties {
         this.extSettings = extSettings;
     }
 
-    public QueueConfigurationProperties() {
-    }
+    public QueueConfigurationProperties() {}
 
     public String getLocation() {
         return location;

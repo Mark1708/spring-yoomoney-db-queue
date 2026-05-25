@@ -5,13 +5,13 @@ spring:
         - local
   datasource:
     url: jdbc:postgresql://localhost:5432/test
-    username: postgres
-    password: postgres
+    username: ${DB_USER:postgres}
+    password: ${DB_PASSWORD:change-me}
   rabbitmq:
     host: localhost
     port: 5672
-    password: password
-    username: user
+    password: ${RABBIT_PASS:change-me}
+    username: ${RABBIT_USER:user}
   db-queue:
     enabled: true
     config:

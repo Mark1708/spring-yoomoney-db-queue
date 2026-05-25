@@ -5,8 +5,8 @@ spring:
         - local
   datasource:
     url: jdbc:postgresql://localhost:5432/test
-    username: postgres
-    password: postgres
+    username: ${DB_USER:postgres}
+    password: ${DB_PASSWORD:change-me}
   db-queue:
     enabled: true
     config:

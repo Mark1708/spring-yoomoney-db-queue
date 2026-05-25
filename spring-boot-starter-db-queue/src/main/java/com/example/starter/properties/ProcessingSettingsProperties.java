@@ -12,8 +12,7 @@ public class ProcessingSettingsProperties {
         this.threadCount = threadCount;
     }
 
-    public ProcessingSettingsProperties() {
-    }
+    public ProcessingSettingsProperties() {}
 
     public ProcessingMode getProcessingMode() {
         return processingMode;

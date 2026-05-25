@@ -1,7 +1,6 @@
 package com.example.starter.properties;
 
 import com.example.dbqueue.settings.FailRetryType;
-
 import java.time.Duration;
 
 public class FailureSettingsProperties {
@@ -14,8 +13,7 @@ public class FailureSettingsProperties {
         this.retryInterval = retryInterval;
     }
 
-    public FailureSettingsProperties() {
-    }
+    public FailureSettingsProperties() {}
 
     public FailRetryType getRetryType() {
         return retryType;

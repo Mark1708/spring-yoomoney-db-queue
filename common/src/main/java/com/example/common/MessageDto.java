@@ -13,8 +13,7 @@ public class MessageDto {
         this.testId = testId;
     }
 
-    public MessageDto() {
-    }
+    public MessageDto() {}
 
     public String getMessage() {
         return message;

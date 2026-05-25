@@ -1,7 +1,14 @@
 package org.example.test.controller;
 
+import static org.springframework.http.MediaType.APPLICATION_JSON;
+
 import com.example.common.MessageDto;
 import jakarta.transaction.Transactional;
+import java.time.LocalDateTime;
+import java.util.Arrays;
+import java.util.List;
+import java.util.concurrent.Executor;
+import java.util.concurrent.atomic.AtomicInteger;
 import lombok.RequiredArgsConstructor;
 import org.example.test.domain.Test;
 import org.example.test.dto.TestResult;
@@ -12,14 +19,6 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.client.RestClient;
-
-import java.time.LocalDateTime;
-import java.util.Arrays;
-import java.util.List;
-import java.util.concurrent.Executor;
-import java.util.concurrent.atomic.AtomicInteger;
-
-import static org.springframework.http.MediaType.APPLICATION_JSON;
 
 @RestController
 @RequiredArgsConstructor
@@ -43,9 +42,7 @@ public class TestController {
     @PostMapping
     public String startTest(Integer testDataCount) {
         List<RestClient> restClients = Arrays.stream(producers.split(","))
-                .map(url -> RestClient.builder()
-                        .baseUrl(url)
-                        .build())
+                .map(url -> RestClient.builder().baseUrl(url).build())
                 .toList();
         if (isRunning) {
             return "Test is already running";
@@ -60,9 +57,7 @@ public class TestController {
 
                     client.post()
                             .contentType(APPLICATION_JSON)
-                            .body(
-                                    new MessageDto("Hello " + LocalDateTime.now(), test.getId())
-                            )
+                            .body(new MessageDto("Hello " + LocalDateTime.now(), test.getId()))
                             .retrieve()
                             .toEntity(Void.class);
                 }

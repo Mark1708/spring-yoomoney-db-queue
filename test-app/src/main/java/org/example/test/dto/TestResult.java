@@ -4,12 +4,11 @@ import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.fasterxml.jackson.datatype.jsr310.deser.LocalDateTimeDeserializer;
 import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateTimeSerializer;
-import lombok.Data;
-import org.example.test.domain.Test;
-
 import java.io.Serializable;
 import java.time.Duration;
 import java.time.LocalDateTime;
+import lombok.Data;
+import org.example.test.domain.Test;
 
 @Data
 public class TestResult implements Serializable {
@@ -24,6 +23,7 @@ public class TestResult implements Serializable {
     @JsonDeserialize(using = LocalDateTimeDeserializer.class)
     @JsonSerialize(using = LocalDateTimeSerializer.class)
     private LocalDateTime endAt;
+
     private String status;
     private Duration duration;
     private Double rps;

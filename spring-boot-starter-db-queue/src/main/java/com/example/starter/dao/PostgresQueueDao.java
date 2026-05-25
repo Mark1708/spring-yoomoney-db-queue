@@ -1,21 +1,20 @@
 package com.example.starter.dao;
 
+import static java.util.Objects.requireNonNull;
+
+import com.example.dbqueue.api.EnqueueParams;
+import com.example.dbqueue.config.QueueTableSchema;
+import com.example.dbqueue.dao.QueueDao;
+import com.example.dbqueue.settings.QueueLocation;
 import java.time.Duration;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 import javax.annotation.Nonnull;
-
-import com.example.dbqueue.api.EnqueueParams;
 import org.springframework.jdbc.core.JdbcOperations;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
-import com.example.dbqueue.config.QueueTableSchema;
-import com.example.dbqueue.dao.QueueDao;
-import com.example.dbqueue.settings.QueueLocation;
-
-import static java.util.Objects.requireNonNull;
 
 /**
  * Database access object to manage tasks in the queue for PostgreSQL database type.
@@ -28,6 +27,7 @@ public class PostgresQueueDao implements QueueDao {
 
     @Nonnull
     private final NamedParameterJdbcTemplate jdbcTemplate;
+
     @Nonnull
     private final QueueTableSchema queueTableSchema;
 
@@ -37,8 +37,7 @@ public class PostgresQueueDao implements QueueDao {
      * @param jdbcTemplate     Reference to Spring JDBC template.
      * @param queueTableSchema Queue table scheme.
      */
-    public PostgresQueueDao(@Nonnull JdbcOperations jdbcTemplate,
-                            @Nonnull QueueTableSchema queueTableSchema) {
+    public PostgresQueueDao(@Nonnull JdbcOperations jdbcTemplate, @Nonnull QueueTableSchema queueTableSchema) {
         this.queueTableSchema = requireNonNull(queueTableSchema);
         this.jdbcTemplate = new NamedParameterJdbcTemplate(requireNonNull(jdbcTemplate));
     }
@@ -55,15 +54,19 @@ public class PostgresQueueDao implements QueueDao {
 
         queueTableSchema.getExtFields().forEach(paramName -> params.addValue(paramName, null));
         enqueueParams.getExtData().forEach(params::addValue);
-        return requireNonNull(jdbcTemplate.queryForObject(
-                enqueueSqlCache.computeIfAbsent(location, this::createEnqueueSql), params, Long.class));
+        Long result = jdbcTemplate.queryForObject(
+                enqueueSqlCache.computeIfAbsent(location, this::createEnqueueSql), params, Long.class);
+        if (result == null) {
+            throw new IllegalStateException("enqueue returned null for location: " + location);
+        }
+        return result;
     }
 
     @Override
     public void enqueueBatch(@Nonnull QueueLocation location, @Nonnull List<EnqueueParams<String>> enqueueParams) {
         requireNonNull(location);
         requireNonNull(enqueueParams);
-        
+
         MapSqlParameterSource[] paramsList = enqueueParams.stream()
                 .map(it -> {
                     MapSqlParameterSource params = new MapSqlParameterSource()
@@ -75,16 +78,16 @@ public class PostgresQueueDao implements QueueDao {
                     return params;
                 })
                 .toArray(MapSqlParameterSource[]::new);
-        
+
         jdbcTemplate.batchUpdate(enqueueSqlCache.computeIfAbsent(location, this::createEnqueueSql), paramsList);
     }
-
 
     @Override
     public boolean deleteTask(@Nonnull QueueLocation location, long taskId) {
         requireNonNull(location);
 
-        int updatedRows = jdbcTemplate.update(deleteSqlCache.computeIfAbsent(location, this::createDeleteSql),
+        int updatedRows = jdbcTemplate.update(
+                deleteSqlCache.computeIfAbsent(location, this::createDeleteSql),
                 new MapSqlParameterSource()
                         .addValue("id", taskId)
                         .addValue("queueName", location.getQueueId().asString()));
@@ -95,7 +98,8 @@ public class PostgresQueueDao implements QueueDao {
     public boolean reenqueue(@Nonnull QueueLocation location, long taskId, @Nonnull Duration executionDelay) {
         requireNonNull(location);
         requireNonNull(executionDelay);
-        int updatedRows = jdbcTemplate.update(reenqueueSqlCache.computeIfAbsent(location, this::createReenqueueSql),
+        int updatedRows = jdbcTemplate.update(
+                reenqueueSqlCache.computeIfAbsent(location, this::createReenqueueSql),
                 new MapSqlParameterSource()
                         .addValue("id", taskId)
                         .addValue("queueName", location.getQueueId().asString())
@@ -104,36 +108,45 @@ public class PostgresQueueDao implements QueueDao {
     }
 
     private String createEnqueueSql(@Nonnull QueueLocation location) {
-        return "INSERT INTO " + location.getTableName() + "(" +
-                (location.getIdSequence().map(ignored -> queueTableSchema.getIdField() + ",").orElse("")) +
-                queueTableSchema.getQueueNameField() + "," +
-                queueTableSchema.getPayloadField() + "," +
-                queueTableSchema.getNextProcessAtField() + "," +
-                queueTableSchema.getReenqueueAttemptField() + "," +
-                queueTableSchema.getTotalAttemptField() +
-                (queueTableSchema.getExtFields().isEmpty() ? "" :
-                        queueTableSchema.getExtFields().stream().collect(Collectors.joining(", ", ", ", ""))) +
-                ") VALUES " +
-                "(" + location.getIdSequence().map(seq -> "nextval('" + seq + "'), ").orElse("") +
-                ":queueName, :payload, now() + :executionDelay * INTERVAL '1 MILLISECOND', 0, 0" +
-                (queueTableSchema.getExtFields().isEmpty() ? "" : queueTableSchema.getExtFields().stream()
-                        .map(field -> ":" + field).collect(Collectors.joining(", ", ", ", ""))) +
-                ") RETURNING " + queueTableSchema.getIdField();
+        return "INSERT INTO " + location.getTableName() + "("
+                + (location.getIdSequence()
+                        .map(ignored -> queueTableSchema.getIdField() + ",")
+                        .orElse(""))
+                + queueTableSchema.getQueueNameField()
+                + "," + queueTableSchema.getPayloadField()
+                + "," + queueTableSchema.getNextProcessAtField()
+                + "," + queueTableSchema.getReenqueueAttemptField()
+                + "," + queueTableSchema.getTotalAttemptField()
+                + (queueTableSchema.getExtFields().isEmpty()
+                        ? ""
+                        : queueTableSchema.getExtFields().stream().collect(Collectors.joining(", ", ", ", "")))
+                + ") VALUES "
+                + "("
+                + location.getIdSequence()
+                        .map(seq -> "nextval('" + seq + "'), ")
+                        .orElse("") + ":queueName, :payload, now() + :executionDelay * INTERVAL '1 MILLISECOND', 0, 0"
+                + (queueTableSchema.getExtFields().isEmpty()
+                        ? ""
+                        : queueTableSchema.getExtFields().stream()
+                                .map(field -> ":" + field)
+                                .collect(Collectors.joining(", ", ", ", "")))
+                + ") RETURNING "
+                + queueTableSchema.getIdField();
     }
 
     private String createDeleteSql(@Nonnull QueueLocation location) {
-        return "DELETE FROM " + location.getTableName() + " WHERE " + queueTableSchema.getQueueNameField() +
-                " = :queueName AND " + queueTableSchema.getIdField() + " = :id";
+        return "DELETE FROM " + location.getTableName() + " WHERE " + queueTableSchema.getQueueNameField()
+                + " = :queueName AND " + queueTableSchema.getIdField() + " = :id";
     }
 
     private String createReenqueueSql(@Nonnull QueueLocation location) {
-        return "UPDATE " + location.getTableName() + " SET " + queueTableSchema.getNextProcessAtField() +
-                " = now() + :executionDelay * INTERVAL '1 MILLISECOND', " +
-                queueTableSchema.getAttemptField() + " = 0, " +
-                queueTableSchema.getReenqueueAttemptField() +
-                " = " + queueTableSchema.getReenqueueAttemptField() + " + 1 " +
-                "WHERE " + queueTableSchema.getIdField() + " = :id AND " +
-                queueTableSchema.getQueueNameField() + " = :queueName";
+        return "UPDATE " + location.getTableName() + " SET " + queueTableSchema.getNextProcessAtField()
+                + " = now() + :executionDelay * INTERVAL '1 MILLISECOND', "
+                + queueTableSchema.getAttemptField()
+                + " = 0, " + queueTableSchema.getReenqueueAttemptField()
+                + " = "
+                + queueTableSchema.getReenqueueAttemptField() + " + 1 " + "WHERE "
+                + queueTableSchema.getIdField() + " = :id AND " + queueTableSchema.getQueueNameField()
+                + " = :queueName";
     }
-
 }

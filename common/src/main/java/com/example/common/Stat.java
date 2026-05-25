@@ -15,8 +15,7 @@ public class Stat {
         this.receivedAt = receivedAt;
     }
 
-    public Stat() {
-    }
+    public Stat() {}
 
     public Long getId() {
         return id;
@@ -47,7 +46,9 @@ public class Stat {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         Stat stat = (Stat) o;
-        return Objects.equals(id, stat.id) && Objects.equals(sentAt, stat.sentAt) && Objects.equals(receivedAt, stat.receivedAt);
+        return Objects.equals(id, stat.id)
+                && Objects.equals(sentAt, stat.sentAt)
+                && Objects.equals(receivedAt, stat.receivedAt);
     }
 
     @Override

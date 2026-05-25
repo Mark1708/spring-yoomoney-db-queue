@@ -19,12 +19,10 @@ public class RabbitMQConsumer {
 
     @RabbitListener(queues = "queue1")
     public void processMyQueue(Stat message) {
-        testMessageStatRepository.save(
-                TestMessageStat.builder()
-                        .sentAt(message.getSentAt())
-                        .receivedAt(message.getReceivedAt())
-                        .testId(message.getId())
-                        .build()
-        );
+        testMessageStatRepository.save(TestMessageStat.builder()
+                .sentAt(message.getSentAt())
+                .receivedAt(message.getReceivedAt())
+                .testId(message.getId())
+                .build());
     }
 }
