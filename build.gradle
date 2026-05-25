@@ -1,2 +1,40 @@
+plugins {
+    id 'com.github.spotbugs' version '6.0.7' apply false
+    id 'com.diffplug.spotless' version '6.25.0' apply false
+}
+
 group 'com.example'
 version '1.0.0'
+
+subprojects { subproj ->
+    subproj.plugins.withId('java') {
+        // --- SpotBugs + FindSecBugs ---
+        subproj.apply plugin: 'com.github.spotbugs'
+
+        subproj.spotbugs {
+            effort = com.github.spotbugs.snom.Effort.MAX
+            toolVersion = '4.9.8'
+            includeFilter = subproj.file("${rootDir}/build-tools/spotbugs-include.xml")
+            excludeFilter = subproj.file("${rootDir}/build-tools/spotbugs-exclude.xml")
+        }
+
+        subproj.dependencies {
+            spotbugsPlugins 'com.h3xstream.findsecbugs:findsecbugs-plugin:1.13.0'
+        }
+
+        // --- Spotless ---
+        subproj.apply plugin: 'com.diffplug.spotless'
+
+        subproj.spotless {
+            java {
+                target 'src/main/java/**/*.java', 'src/test/java/**/*.java'
+                targetExclude '**/generated-sources/**', 'build/**'
+                palantirJavaFormat('2.91.0')
+                removeUnusedImports()
+                trimTrailingWhitespace()
+                endWithNewline()
+                toggleOffOn '@formatter:off', '@formatter:on'
+            }
+        }
+    }
+}
