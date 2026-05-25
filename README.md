@@ -1,92 +1,75 @@
 # spring-yoomoney-db-queue
-## Тема: Исследование влияния различных параметров таблиц в работе с очередями сообщений на основе базы данных
 
-## Задачи
-### Цель исследования
-Целью данного научно-исследовательской работы является изучение влияния различных параметров таблиц в работе с очередями сообщений на основе базы данных. 
+Backend research experiment on PostgreSQL-backed message queues.
 
-Основной акцент будет сделан на оптимизацию пропускной способности очереди сообщений, с целью достичь **1000 RPS**.
+[Русская версия](README.ru.md)
 
-### Задачи и этапы исследования
-1. Разработка библиотеки для взаимодействия с базой данных в качестве брокера сообщений.
-2. Подготовка базы данных для проведения экспериментов.
-3. Проектирование и реализация двух сервисов - Producer и Consumer, обеспечивающих передачу и прием данных через брокера сообщений.
-4. Оптимизация базы данных
-5. Тестирование различных параметров таблицы и их влияния на эффективность системы.
+## Project scope
 
-## Результаты
-Для тестирования использовалась база данных PostgreSQL.
+This repository explores how PostgreSQL table design affects queue throughput:
 
-С таблицами на которых проводились тесты можно ознакомиться в файле `sql/create_tables.sql`
-* `queue_tasks_1` - Обычная таблица
-* `queue_tasks_2` - Вакумация + индекс btree
-* `queue_tasks_3` - Вакумация + индекс btree + fillfactor
-* `queue_tasks_4` - Вакумация + индекс btree + fillfactor + партиционировани с секционированием на 6 частей
-* `queue_tasks_5` - Вакумация + индекс btree + fillfactor + партиционировани с секционированием на 8 частей
+- baseline table
+- autovacuum tuning
+- btree index
+- fillfactor tuning
+- hash partitioning
 
-### Что получилось?
-|   Конфигурация    | Batch  |     RPS     |     Изменение      |   Изменение в %    |
-|:-----------------:|:------:|:-----------:|:------------------:|:------------------:|
-|   queue_tasks_1   |   1    |   334,69    | Будем считать за 0 | Будем считать за 0 |
-|   queue_tasks_1   |   10   |   1222,82   |       888,12       |       265,35       |
-|   queue_tasks_2   |   10   |   1275,85   |       941,15       |       281,20       |
-|   queue_tasks_3   |   10   |   1230,76   |       896,06       |       267,73       |
-|   queue_tasks_4   |   10   |   1310,81   |       976,11       |       291,64       |
-| **queue_tasks_5** | **10** | **1314,12** |     **979,42**     |     **292,63**     |
-|   queue_tasks_5   |   20   |   1289,58   |       954,88       |       285,30       |
-> Тестирование проводилось в достаточно щадящем режиме)
+The goal was to understand which layout gives the best write/read throughput and whether PostgreSQL can be a practical queue backend for high-load services.
 
-Как можно заметить самым эффективным вариантом оказалось использование сетапа таблицы `queue_tasks_5` с записью/чтением батчами по **10** записей.
+## Research focus
 
-Далее я провел тестирование с более высокими нагрузками и проанализировал более детально нагрузку в течении работы системы. </br>
-Результаты тестирования показали стабильную работу системы при максимальной нагрузке. </br>
-Показатели нагрузки в течение тестирования  и анализ метрик позволяют сделать выводы о эффективности и устойчивости разработанного подхода.
+- build a small queue library on top of PostgreSQL
+- prepare reproducible test data and schema variants
+- run producer/consumer load tests
+- compare RPS, latency, and stability under load
+
+## Results
+
+The best result in this setup came from `queue_tasks_5` with batch size `10`.
+
+| Configuration | Batch | RPS | Delta | Delta % |
+|---|---:|---:|---:|---:|
+| queue_tasks_1 | 1 | 334,69 | baseline | baseline |
+| queue_tasks_1 | 10 | 1222,82 | 888,12 | 265,35 |
+| queue_tasks_2 | 10 | 1275,85 | 941,15 | 281,20 |
+| queue_tasks_3 | 10 | 1230,76 | 896,06 | 267,73 |
+| queue_tasks_4 | 10 | 1310,81 | 976,11 | 291,64 |
+| queue_tasks_5 | 10 | 1314,12 | 979,42 | 292,63 |
+| queue_tasks_5 | 20 | 1289,58 | 954,88 | 285,30 |
+
+Conclusion: hash partitioning with tuned storage parameters provided the most stable throughput in this benchmark.
+
+## Visuals
 
 <p align="center">
   <img width="auto" height="300" src="assets/latency.png">
 </p>
-<p align="center">Рисунок 1. Задержка (min/avg/max)</p>
+<p align="center">Latency (min/avg/max)</p>
 
 <p align="center">
   <img width="auto" height="250" src="assets/RPS.png">
 </p>
-<p align="center">Рисунок 2. Кол-во запросов в секунду</p>
+<p align="center">Requests per second</p>
 
-### Преимущества и недостатки подхода
-Преимущества:
-* Низкая стоимость масштабирования.
-* Достойная пропускная способность.
-* Гибкая платформа для реализации разных способов взаимодействия с очередью сообщений.
+## Reproducibility
 
-Недостатки:
-* Является антипаттерном в большинстве случаев.
-* Наличие сложности организации совместной работы нескольких сервисов.
+Copy the environment template and start the local stack:
 
-### Выводы и дальнейшие перспективы
-В ходе работ над этой темой было проведено сравнение различных способов оптимизации таблиц для очереди ообщений и походов к чтению/записи.
-Как можно заметить наиболее эффективным способом оптимизации очереди оказалось партиционирование таблицы.
-Тем не менее использование такого подхода по-прежнему распространено для решения ряда задач.
-
-## Инструкция по запуску
-```shell
+```sh
+cp .env.example .env
 docker compose up -d
 ```
 
-## Технологии
-* Spring-Boot 3
-* Java 21
-* PostgreSQL
-* [db-queue](https://github.com/db-queue/db-queue)
+## Stack
 
-## Статус
-Проект _закончен_
+- Spring Boot 3
+- Java 21
+- PostgreSQL
+- db-queue
 
-## Цель
-Проект сделан в образовательных целях
+## Notes
 
-## Контакты
-Выполнен [Гурьяновым Марком](https://mark1708.github.io/) под чутким руководством [kartzum](https://github.com/kartzum)
-#### +7(962)024-50-04 | mark1708.work@gmail.com | [github](http://github.com/Mark1708)
-
-![Readme Card](https://github-readme-stats.vercel.app/api/pin/?username=Mark1708&repo=spring-yoomoney-db-queue&theme=chartreuse-dark&show_icons=true)
+- This is a research prototype, not a maintained backend service.
+- The benchmark narrative and schema variants are preserved for comparison.
+- Inspiration: [db-queue](https://github.com/db-queue/db-queue).
 
