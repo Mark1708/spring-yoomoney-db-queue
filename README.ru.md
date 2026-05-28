@@ -29,7 +29,7 @@
 | Поле | Значение |
 | --- | --- |
 | Тип репозитория | Backend-бенчмарк / сохранённый исследовательский срез |
-| Runtime | Java 21 |
+| Runtime-среда | Java 21 |
 | Framework | Spring Boot 3.2.2 |
 | Сборка | Gradle multi-project build |
 | Хранилище | PostgreSQL |
@@ -97,7 +97,7 @@ docker compose up -d
 
 Compose запускает:
 
-| Service | Назначение | Local endpoint |
+| Сервис | Назначение | Local endpoint |
 | --- | --- | --- |
 | `producer-app` | Пишет сообщения в очередь поверх PostgreSQL | `http://localhost:8070/` |
 | `consumer-app` | Читает очередь и отправляет статистику обработки | `http://localhost:8090/` |
@@ -146,7 +146,7 @@ curl http://localhost:8080/
 
 В репозитории сохранены три артефакта с результатами:
 
-| Artifact | Meaning |
+| Артефакт | Значение |
 | --- | --- |
 | [`assets/presentation.pdf`](assets/presentation.pdf) | Исходная презентация с методикой, вариантами таблиц, таблицей результатов и выводами. |
 | [`assets/latency.png`](assets/latency.png) | График latency с min/avg/max latency по накопленному числу сообщений. |
@@ -162,7 +162,7 @@ curl http://localhost:8080/
 <p align="center">
   <img width="auto" height="250" src="assets/RPS.png">
 </p>
-<p align="center">Runtime requests per second</p>
+<p align="center">Запросы в секунду во время выполнения</p>
 
 ## Ограничения
 
