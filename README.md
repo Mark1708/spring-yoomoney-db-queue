@@ -182,3 +182,7 @@ The RPS chart is a time-series from a run, while the comparison table is an aggr
 ## Status
 
 Backend/research project. The repository preserves benchmark context, implementation notes, and reproducibility guidance; it is not maintained as a production-ready queue service.
+
+## License
+
+[MIT](LICENSE)
